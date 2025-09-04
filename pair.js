@@ -742,6 +742,8 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
+
+            }            
                     case 'csong': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
@@ -826,6 +828,7 @@ function setupCommandHandlers(socket, number) {
     }
 
                 break;
+          }             
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
