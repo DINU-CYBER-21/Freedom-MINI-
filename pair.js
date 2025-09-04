@@ -470,6 +470,8 @@ function setupCommandHandlers(socket, number) {
 ║ 🔎 *${config.PREFIX}google*    ➜ Google search
 ║ 🎥 *${config.PREFIX}video*     ➜ Download videos
 ║ ⏱️ *${config.PREFIX}runtime*   ➜ Uptime info
+║ 👤 *${config.PREFIX}dinu*      ➜ Dinu info
+║ 👤 *${config.PREFIX}rukshan*   ➜ Rukshan info
 ║ 🖼️ *${config.PREFIX}getdp*     ➜ Get profile picture
 ║ 📂 *${config.PREFIX}repo*      ➜ Bot repo link
 ╠───────────────────────────────╣
@@ -740,117 +742,6 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
-                    case "cinesub34":
-        case "movie67": {
-          try {
-            await dragon.sendMessage(from, { react: { text: `🕐`, key: m.key } });
-        
-            const searchQuery = encodeURIComponent(text);
-            const { data } = await axios.get(`https://apis.davidcyriltech.my.id/movies/search?query=${searchQuery}`);
-        
-            if (!data.status || !data.results.length) {
-              return m.reply("❗ No movies found. Try a different name.");
-            }
-        
-            const movie = data.results[0]; // Take the first search result
-            let caption = `🎬 *${movie.title}*\n📅 *Year:* ${movie.year}\n⭐ *${movie.imdb}*\n\n📥 Choose quality:\n\n*1.* 720p\n*2.* 480p\n\n_Reply with the number!_`;
-        
-            const qlive = {
-              key: {
-                participant: "0@s.whatsapp.net",
-                ...(m.chat ? { remoteJid: "status@broadcast" } : {}),
-              },
-              message: {
-                liveLocationMessage: {
-                  caption: `🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️`,
-                  jpegThumbnail: "",
-                },
-              },
-            };
-        
-            const waitMsg = await dragon.sendMessage(
-              from,
-              { text: "*Loading*...80%" },
-              { quoted: m}
-            );
-        
-            const sentMessage = await dragon.sendMessage(
-              m.chat,
-              {
-                image: { url: movie.image },
-                caption: caption,
-                contextInfo: {
-                  mentionedJid: [m.sender],
-                  forwardingScore: 999,
-                  isForwarded: true,
-                  externalAdReply: {
-                    title: "SOLO-LEVELING-MINI",
-                    body: "Movie Download",
-                    mediaType: 2,
-                    previewType: 0,
-                    renderLargerThumbnail: true,
-                    thumbnailUrl: movie.image,
-                    sourceUrl: movie.link,
-                  },
-                },
-              },
-              { quoted: ai }
-            );
-        
-            // Now wait for user reply
-            dragon.ev.on("messages.upsert", async (chatUpdate) => {
-              try {
-                const mek = chatUpdate.messages[0];
-                if (
-                  mek.message &&
-                  mek.message.extendedTextMessage &&,
-                  mek.message.extendedTextMessage.contextInfo &&
-                  mek.message.extendedTextMessage.contextInfo.stanzaId === sentMessage.key.id
-                ) {
-                  const comm = mek.message.extendedTextMessage.text.trim();
-                  if (comm !== "1" && comm !== "2") {
-                    return m.reply("❗ Invalid option. Reply with *1* or *2*.");
-                  }
-        
-                  await dragon.sendMessage(from, { react: { text: `🎬`, key: m.key } });
-        
-                  // Now fetch download links
-                  const { data: downloadData } = await axios.get(`https://apis.davidcyriltech.my.id/movies/download?url=${encodeURIComponent(movie.link)}`);
-                  
-                  if (!downloadData.status || !downloadData.movie) {
-                    return m.reply("❗ Failed to fetch download links.");
-                  }
-        
-                  let chosenQuality = comm === "1" ? "HD 720p" : "SD 480p";
-                  const found = downloadData.movie.download_links.find(link => link.quality === chosenQuality);
-        
-                  if (!nonfound) {
-                    return m.reply(`❗ ${chosenQuality} download not available.`);
-                  }
-        
-                  await dragon.sendMessage(
-                    from,
-                    {
-                      document: { url: found.direct_download },
-                      mimetype: "video/mp4",
-                      fileName: `(download.data).mp4`,
-                    },
-                    { quoted: mek }
-                  );
-        
-                  await dragon.sendMessage(from, { react: { text: `✅`, key: m.key } });
-                }
-              } catch (err) {
-                console.error("Error handling user reply:", err);
-              }
-            });
-        
-          } catch (error) {
-            console.error("Error in movie command:", error);
-            m.reply("❌ An error occurred while processing your request.");
-          }
-        }
-        break;
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
@@ -950,6 +841,52 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
+                    case 'img': {
+    const prefix = config.PREFIX;
+    const q = body.replace(/^[.\/!]img\s*/i, '').trim();
+
+    if (!q) return await socket.sendMessage(sender, {
+        text: '🔍 Please provide a search query. Ex: `.img sunset`'
+    }, { quoted: msg });
+
+    try {
+        const res = await axios.get(`https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`);
+        const data = res.data.data;
+
+        if (!data || data.length === 0) {
+            return await socket.sendMessage(sender, {
+                text: '❌ No images found for your query.'
+            }, { quoted: msg });
+        }
+
+        const randomImage = data[Math.floor(Math.random() * data.length)];
+
+        const buttons = [
+            {
+                buttonId: `${prefix}img ${q}`,
+                buttonText: { displayText: "⏩ Next Image" },
+                type: 1,
+            }
+        ];
+
+        const buttonMessage = {
+            image: { url: randomImage },
+            caption: `🖼️ *Image Search:* ${q}\n`,
+            footer: config.FOOTER || '> 𝗦𝗢𝗟𝗢 𝗟𝗘𝗩𝗘𝗟𝗜𝗡𝗚 𝗫',
+            buttons: buttons,
+            headerType: 4
+        };
+
+        await socket.sendMessage(from, buttonMessage, { quoted: msg });
+
+    } catch (err) {
+        console.error("❌ image axios error:", err.message);
+        await socket.sendMessage(sender, {
+            text: '❌ Failed to fetch images.'
+        }, { quoted: msg });
+    }
+
+    break;
                 case 'song': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
