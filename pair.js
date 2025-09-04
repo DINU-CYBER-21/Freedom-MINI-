@@ -427,7 +427,7 @@ function setupCommandHandlers(socket, number) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363402466616623@newsletter',
-                newsletterName: '𝙻𝙾𝙳 𝚇 𝙵𝚁𝙴𝙴 𝚅4 🪻',
+                newsletterName: '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
                 serverMessageId: 143
             }
         }
