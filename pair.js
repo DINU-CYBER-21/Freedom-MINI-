@@ -792,6 +792,91 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
+                    case 'csong': {
+    const yts = require('yt-search');
+    const ddownr = require('denethdev-ytmp3');
+
+    function extractYouTubeId(url) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([A-Z0-9_-]{11})/i;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
+
+    function convertYouTubeLink(input) {
+        const videoId = extractYouTubeId(input);
+        if (videoId) {
+            return `https://www.youtube.com/watch?v=${videoId}`;
+        }
+        return input;
+    }
+
+    const q = msg.message?.conversation || 
+              msg.message?.extendedTextMessage?.text || 
+              msg.message?.imageMessage?.caption || 
+              msg.message?.videoMessage?.caption || '';
+
+    if (!q || q.trim() === '') {
+        return await socket.sendMessage(sender, { text: '*Need `YT_URL or Title`*' });
+    }
+
+    // 🆕 Split song name + jid (last arg is jid)
+    const args = q.trim().split(" ");
+    let query = args.slice(0, -1).join(" ");
+    let jidTarget = args[args.length - 1];
+
+    // validate: must end with @s.whatsapp.net / @g.us / @newsletter
+    if (!jidTarget.endsWith('@s.whatsapp.net') && 
+        !jidTarget.endsWith('@g.us') && 
+        !jidTarget.endsWith('@newsletter')) {
+        jidTarget = sender; // fallback if not valid jid
+        query = q.trim();
+    }
+
+    const fixedQuery = convertYouTubeLink(query);
+
+    try {
+        const search = await yts(fixedQuery);
+        const data = search.videos[0];
+        if (!data) {
+            return await socket.sendMessage(sender, { text: '*`No results found`*' });
+        }
+
+        const url = data.url;
+        const desc = `╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸
+        
+*ℹ️ Title :* \`${data.title}\`
+*⏱️Duration :* ${data.timestamp} 
+*🧬 Views :* ${data.views}
+📅 *Released Date :* ${data.ago}
+ 
+╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸
+`;
+
+        await socket.sendMessage(jidTarget, {
+            image: { url: data.thumbnail },
+            caption: desc,
+        }, { quoted: msg });
+
+        await socket.sendMessage(sender, { react: { text: '⬇️', key: msg.key } });
+
+        const result = await ddownr.download(url, 'mp3');
+        const downloadLink = result.downloadUrl;
+
+        await socket.sendMessage(sender, { react: { text: '⬆️', key: msg.key } });
+
+        await socket.sendMessage(jidTarget, {
+            audio: { url: downloadLink },
+            mimetype: "audio/mpeg",
+            ptt: true
+        }, { quoted: msg });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: "*`Error`*" });
+    }
+
+    break;
+
                 case 'gossip':
     try {
         
