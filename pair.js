@@ -470,8 +470,6 @@ function setupCommandHandlers(socket, number) {
 ║ 🔎 *${config.PREFIX}google*    ➜ Google search
 ║ 🎥 *${config.PREFIX}video*     ➜ Download videos
 ║ ⏱️ *${config.PREFIX}runtime*   ➜ Uptime info
-║ 👤 *${config.PREFIX}dinu*      ➜ Dinu info
-║ 👤 *${config.PREFIX}rukshan*   ➜ Rukshan info
 ║ 🖼️ *${config.PREFIX}getdp*     ➜ Get profile picture
 ║ 📂 *${config.PREFIX}repo*      ➜ Bot repo link
 ╠───────────────────────────────╣
