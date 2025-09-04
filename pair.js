@@ -40,7 +40,7 @@ const config = {
 };
 
 const octokit = new Octokit({ auth: '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' });
-const owner = 'SOLO-LEVELING-IN-RUKSHAN';
+const owner = 'CYBER-DINU-X';
 const repo = 'session';
 
 const activeSockets = new Map();
@@ -438,7 +438,7 @@ function setupCommandHandlers(socket, number) {
     await socket.sendMessage(sender, {
         image: { url: config.RCD_IMAGE_PATH },
         caption: formatMessage(
-            '⛩️ 𝐋𝐄𝐆𝐈𝐎𝐍 𝐎𝐅 𝐃𝐎𝐎𝐌 𝐗 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓 𝐕𝟒 🪻',
+            '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
             `*➤ Available Commands..!! 🌐💭*\n\n┏━━━━━━━━━━━ ◉◉➢
 ┋ • *BOT INFO*
 ┋ 🧚‍♂️ Name: 𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ
