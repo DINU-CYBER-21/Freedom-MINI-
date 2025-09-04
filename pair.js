@@ -432,7 +432,7 @@ function setupCommandHandlers(socket, number) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363402466616623@newsletter',
-                newsletterName: '𝙻𝙾𝙳 𝚇 𝙵𝚁𝙴𝙴 𝚅4 🪻',
+                newsletterName: '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
                 serverMessageId: 143
             }
         }
@@ -443,7 +443,7 @@ function setupCommandHandlers(socket, number) {
     await socket.sendMessage(sender, {
         image: { url: config.RCD_IMAGE_PATH },
         caption: formatMessage(
-            '⛩️ 𝐋𝐄𝐆𝐈𝐎𝐍 𝐎𝐅 𝐃𝐎𝐎𝐌 𝐗 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓 𝐕𝟒 🪻',
+            '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
             `*➤ Available Commands..!! 🌐💭*\n\n┏━━━━━━━━━━━ ◉◉➢
 ┋ • *BOT INFO*
 ┋ 🧚‍♂️ Name: 𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ
