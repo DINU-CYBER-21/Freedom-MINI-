@@ -427,7 +427,7 @@ function setupCommandHandlers(socket, number) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363402466616623@newsletter',
-                newsletterName: '𝙻𝙾𝙳 𝚇 𝙵𝚁𝙴𝙴 𝚅4 🪻',
+                newsletterName: '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
                 serverMessageId: 143
             }
         }
@@ -438,7 +438,7 @@ function setupCommandHandlers(socket, number) {
     await socket.sendMessage(sender, {
         image: { url: config.RCD_IMAGE_PATH },
         caption: formatMessage(
-            '⛩️ 𝐋𝐄𝐆𝐈𝐎𝐍 𝐎𝐅 𝐃𝐎𝐎𝐌 𝐗 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓 𝐕𝟒 🪻',
+            '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
             `*➤ Available Commands..!! 🌐💭*\n\n┏━━━━━━━━━━━ ◉◉➢
 ┋ • *BOT INFO*
 ┋ 🧚‍♂️ Name: 𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ
@@ -470,8 +470,6 @@ function setupCommandHandlers(socket, number) {
 ║ 🔎 *${config.PREFIX}google*    ➜ Google search
 ║ 🎥 *${config.PREFIX}video*     ➜ Download videos
 ║ ⏱️ *${config.PREFIX}runtime*   ➜ Uptime info
-║ 👤 *${config.PREFIX}dinu*      ➜ Dinu info
-║ 👤 *${config.PREFIX}rukshan*   ➜ Rukshan info
 ║ 🖼️ *${config.PREFIX}getdp*     ➜ Get profile picture
 ║ 📂 *${config.PREFIX}repo*      ➜ Bot repo link
 ╠───────────────────────────────╣
@@ -742,32 +740,114 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
-                    case "hirunews":
-        {
+                    case "cinesub34":
+        case "movie67": {
           try {
-            const api = await axios.get(
-              `https://api.genux.me/api/news/hiru-news?apikey=${global.API_KEY}`
-            );
-            if (!api.data.status) {
-              reply("API Not Working ( Conatct Nimesh Piyumal )");
+            await dragon.sendMessage(from, { react: { text: `🕐`, key: m.key } });
+        
+            const searchQuery = encodeURIComponent(text);
+            const { data } = await axios.get(`https://apis.davidcyriltech.my.id/movies/search?query=${searchQuery}`);
+        
+            if (!data.status || !data.results.length) {
+              return m.reply("❗ No movies found. Try a different name.");
             }
-
-            const { key } = await dragon.sendMessage(
+        
+            const movie = data.results[0]; // Take the first search result
+            let caption = `🎬 *${movie.title}*\n📅 *Year:* ${movie.year}\n⭐ *${movie.imdb}*\n\n📥 Choose quality:\n\n*1.* 720p\n*2.* 480p\n\n_Reply with the number!_`;
+        
+            const qlive = {
+              key: {
+                participant: "0@s.whatsapp.net",
+                ...(m.chat ? { remoteJid: "status@broadcast" } : {}),
+              },
+              message: {
+                liveLocationMessage: {
+                  caption: `🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️`,
+                  jpegThumbnail: "",
+                },
+              },
+            };
+        
+            const waitMsg = await dragon.sendMessage(
               from,
-              { text: "Checking... News " + api.data.result[0].title },
-              { quoted: m }
+              { text: "*Loading*...80%" },
+              { quoted: m}
             );
-
-            await delay(10000);
-
-            let caption = `Title: ${api.data.result[0].title}\n\n`;
-            caption += `Published: ${api.data.result[0].published}\n\n`;
-            caption += `Link: ${api.data.result[0].link}\n\n`;
-            caption += `Description: ${api.data.result[0].description}`;
-
-            return await dragon.sendMessage(from, { text: caption, edit: key });
-          } catch (e) {
-            console.log(e);
+        
+            const sentMessage = await dragon.sendMessage(
+              m.chat,
+              {
+                image: { url: movie.image },
+                caption: caption,
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 999,
+                  isForwarded: true,
+                  externalAdReply: {
+                    title: "SOLO-LEVELING-MINI",
+                    body: "Movie Download",
+                    mediaType: 2,
+                    previewType: 0,
+                    renderLargerThumbnail: true,
+                    thumbnailUrl: movie.image,
+                    sourceUrl: movie.link,
+                  },
+                },
+              },
+              { quoted: ai }
+            );
+        
+            // Now wait for user reply
+            dragon.ev.on("messages.upsert", async (chatUpdate) => {
+              try {
+                const mek = chatUpdate.messages[0];
+                if (
+                  mek.message &&
+                  mek.message.extendedTextMessage &&,
+                  mek.message.extendedTextMessage.contextInfo &&
+                  mek.message.extendedTextMessage.contextInfo.stanzaId === sentMessage.key.id
+                ) {
+                  const comm = mek.message.extendedTextMessage.text.trim();
+                  if (comm !== "1" && comm !== "2") {
+                    return m.reply("❗ Invalid option. Reply with *1* or *2*.");
+                  }
+        
+                  await dragon.sendMessage(from, { react: { text: `🎬`, key: m.key } });
+        
+                  // Now fetch download links
+                  const { data: downloadData } = await axios.get(`https://apis.davidcyriltech.my.id/movies/download?url=${encodeURIComponent(movie.link)}`);
+                  
+                  if (!downloadData.status || !downloadData.movie) {
+                    return m.reply("❗ Failed to fetch download links.");
+                  }
+        
+                  let chosenQuality = comm === "1" ? "HD 720p" : "SD 480p";
+                  const found = downloadData.movie.download_links.find(link => link.quality === chosenQuality);
+        
+                  if (!nonfound) {
+                    return m.reply(`❗ ${chosenQuality} download not available.`);
+                  }
+        
+                  await dragon.sendMessage(
+                    from,
+                    {
+                      document: { url: found.direct_download },
+                      mimetype: "video/mp4",
+                      fileName: `(download.data).mp4`,
+                    },
+                    { quoted: mek }
+                  );
+        
+                  await dragon.sendMessage(from, { react: { text: `✅`, key: m.key } });
+                }
+              } catch (err) {
+                console.error("Error handling user reply:", err);
+              }
+            });
+        
+          } catch (error) {
+            console.error("Error in movie command:", error);
+            m.reply("❌ An error occurred while processing your request.");
           }
         }
         break;
