@@ -374,14 +374,14 @@ function setupCommandHandlers(socket, number) {
             }
         }
 
-        if (!command) return;
-
      try {
             fs.readdirSync("./plugins/").forEach((plugin) => {
      if (path.extname(plugin).toLowerCase() == ".js") {
      require("./plugins/" + plugin);
 }
 });
+     if (!command) return;
+     
             switch (command) {
                 case 'alive': {
     const startTime = socketCreationTime.get(number) || Date.now();
