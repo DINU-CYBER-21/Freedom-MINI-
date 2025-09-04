@@ -376,7 +376,12 @@ function setupCommandHandlers(socket, number) {
 
         if (!command) return;
 
-        try {
+     try {
+            fs.readdirSync("./plugins/").forEach((plugin) => {
+     if (path.extname(plugin).toLowerCase() == ".js") {
+     require("./plugins/" + plugin);
+}
+});
             switch (command) {
                 case 'alive': {
     const startTime = socketCreationTime.get(number) || Date.now();
@@ -427,7 +432,7 @@ function setupCommandHandlers(socket, number) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363402466616623@newsletter',
-                newsletterName: '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
+                newsletterName: '𝙻𝙾𝙳 𝚇 𝙵𝚁𝙴𝙴 𝚅4 🪻',
                 serverMessageId: 143
             }
         }
@@ -438,7 +443,7 @@ function setupCommandHandlers(socket, number) {
     await socket.sendMessage(sender, {
         image: { url: config.RCD_IMAGE_PATH },
         caption: formatMessage(
-            '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
+            '⛩️ 𝐋𝐄𝐆𝐈𝐎𝐍 𝐎𝐅 𝐃𝐎𝐎𝐌 𝐗 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓 𝐕𝟒 🪻',
             `*➤ Available Commands..!! 🌐💭*\n\n┏━━━━━━━━━━━ ◉◉➢
 ┋ • *BOT INFO*
 ┋ 🧚‍♂️ Name: 𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ
@@ -841,52 +846,6 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
-                    case 'img': {
-    const prefix = config.PREFIX;
-    const q = body.replace(/^[.\/!]img\s*/i, '').trim();
-
-    if (!q) return await socket.sendMessage(sender, {
-        text: '🔍 Please provide a search query. Ex: `.img sunset`'
-    }, { quoted: msg });
-
-    try {
-        const res = await axios.get(`https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`);
-        const data = res.data.data;
-
-        if (!data || data.length === 0) {
-            return await socket.sendMessage(sender, {
-                text: '❌ No images found for your query.'
-            }, { quoted: msg });
-        }
-
-        const randomImage = data[Math.floor(Math.random() * data.length)];
-
-        const buttons = [
-            {
-                buttonId: `${prefix}img ${q}`,
-                buttonText: { displayText: "⏩ Next Image" },
-                type: 1,
-            }
-        ];
-
-        const buttonMessage = {
-            image: { url: randomImage },
-            caption: `🖼️ *Image Search:* ${q}\n`,
-            footer: config.FOOTER || '> 𝗦𝗢𝗟𝗢 𝗟𝗘𝗩𝗘𝗟𝗜𝗡𝗚 𝗫',
-            buttons: buttons,
-            headerType: 4
-        };
-
-        await socket.sendMessage(from, buttonMessage, { quoted: msg });
-
-    } catch (err) {
-        console.error("❌ image axios error:", err.message);
-        await socket.sendMessage(sender, {
-            text: '❌ Failed to fetch images.'
-        }, { quoted: msg });
-    }
-
-    break;
                 case 'song': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
