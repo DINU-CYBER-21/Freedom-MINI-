@@ -451,31 +451,18 @@ function setupCommandHandlers(socket, number) {
 ┗━━━━━━━━━━━ ◉◉➢\n
 ╔══════════════ ⭓⭓ ➤
 ║ ✨ *${config.PREFIX}alive*      ➜ Show bot status
-║ 🎵 *${config.PREFIX}Song*       ➜ Download Songs
-║ 🎬 *${config.PREFIX}tiktok*     ➜ Download TikTok video
-║ 📘 *${config.PREFIX}fb*         ➜ Download Facebook video
-║ 🤖 *${config.PREFIX}ai*         ➜ New AI Chat
-║ 📰 *${config.PREFIX}news*       ➜ Latest news updates
-║ 🗞️ *${config.PREFIX}gossip*     ➜ Gossip news updates
-║ 🏏 *${config.PREFIX}cricket*    ➜ Cricket updates
+╠───────────────────────────────╣
+║ 🎵 *${config.PREFIX}Song*      ➜ Download Songs
+║ 🎬 *${config.PREFIX}tiktok*     ➜ Download TikTok 
+║ 🎬 *${config.PREFIX}Video*     ➜ Download Video
 ╠───────────────────────────────╣
 ║ 🗑️ *${config.PREFIX}deleteme*  ➜ Delete session
 ║ ⚙️ *${config.PREFIX}status*    ➜ Check bot status
-║ 💥 *${config.PREFIX}boom*      ➜ Boom effect
 ║ 🖥️ *${config.PREFIX}system*    ➜ System info
 ║ 🌤️ *${config.PREFIX}weather*   ➜ Weather updates
 ║ 🆔 *${config.PREFIX}jid*       ➜ Get JID
 ║ 📶 *${config.PREFIX}ping*      ➜ Bot ping
-╠───────────────────────────────╣
-║ 🔎 *${config.PREFIX}google*    ➜ Google search
-║ 🎥 *${config.PREFIX}video*     ➜ Download videos
 ║ ⏱️ *${config.PREFIX}runtime*   ➜ Uptime info
-║ 🖼️ *${config.PREFIX}getdp*     ➜ Get profile picture
-║ 📂 *${config.PREFIX}repo*      ➜ Bot repo link
-╠───────────────────────────────╣
-║ 🤯 *${config.PREFIX}openai*    ➜ OpenAI features
-║ 📰 *${config.PREFIX}silumina*  ➜ Silumina news
-║ 👑 *${config.PREFIX}owner*     ➜ Contact owner
 ║ ⏰ *${config.PREFIX}now*       ➜ Current time & date
 ╚══════════════ ⭓⭓ ➣`,
             '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
