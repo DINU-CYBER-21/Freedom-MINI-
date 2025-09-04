@@ -1156,38 +1156,6 @@ function setupCommandHandlers(socket, number) {
 
     break;
        }
-
-➣➣➣➣➣➣➣➣➣➣➣➣➣
-case "hirunews":
-        {
-          try {
-            const api = await axios.get(
-              `https://api.genux.me/api/news/hiru-news?apikey=${global.API_KEY}`
-            );
-            if (!api.data.status) {
-              reply("API Not Working ( Conatct Nimesh Piyumal )");
-            }
-
-            const { key } = await dragon.sendMessage(
-              from,
-              { text: "Checking... News " + api.data.result[0].title },
-              { quoted: m }
-            );
-
-            await delay(10000);
-
-            let caption = `Title: ${api.data.result[0].title}\n\n`;
-            caption += `Published: ${api.data.result[0].published}\n\n`;
-            caption += `Link: ${api.data.result[0].link}\n\n`;
-            caption += `Description: ${api.data.result[0].description}`;
-
-            return await dragon.sendMessage(from, { text: caption, edit: key });
-          } catch (e) {
-            console.log(e);
-          }
-        }
-        break;
-
     case 'runtime': {
     try {
         const startTime = socketCreationTime.get(number) || Date.now();
@@ -1227,216 +1195,6 @@ case "hirunews":
     }
     break;
 }
-case "cinesub34":
-        case "movie67": {
-          try {
-            await dragon.sendMessage(from, { react: { text: `🕐`, key: m.key } });
-        
-            const searchQuery = encodeURIComponent(text);
-            const { data } = await axios.get(`https://apis.davidcyriltech.my.id/movies/search?query=${searchQuery}`);
-        
-            if (!data.status || !data.results.length) {
-              return m.reply("❗ No movies found. Try a different name.");
-            }
-        
-            const movie = data.results[0]; // Take the first search result
-            let caption = `🎬 *${movie.title}*\n📅 *Year:* ${movie.year}\n⭐ *${movie.imdb}*\n\n📥 Choose quality:\n\n*1.* 720p\n*2.* 480p\n\n_Reply with the number!_`;
-        
-            const qlive = {
-              key: {
-                participant: "0@s.whatsapp.net",
-                ...(m.chat ? { remoteJid: "status@broadcast" } : {}),
-              },
-              message: {
-                liveLocationMessage: {
-                  caption: `𝙲𝚈𝙱𝙴𝚁 𝙵𝚁𝙴𝙴𝙳𝙾𝙼𝙴 𝙼𝙸𝙽𝙸 𝙱𝙾𝚃 ⚡`,
-                  jpegThumbnail: "",
-                },
-              },
-            };
-        
-            const waitMsg = await dragon.sendMessage(
-              from,
-              { text: "*Loading*...80%" },
-              { quoted: m}
-            );
-        
-            const sentMessage = await dragon.sendMessage(
-              m.chat,
-              {
-                image: { url: movie.image },
-                caption: caption,
-                contextInfo: {
-                  mentionedJid: [m.sender],
-                  forwardingScore: 999,
-                  isForwarded: true,
-                  externalAdReply: {
-                    title: "𝙲𝚈𝙱𝙴𝚁 𝙵𝚁𝙴𝙴𝙳𝙾𝙼𝙴 𝙼𝙸𝙽𝙸 𝙱𝙾𝚃 ⚡",
-                    body: "Movie Download",
-                    mediaType: 2,
-                    previewType: 0,
-                    renderLargerThumbnail: true,
-                    thumbnailUrl: movie.image,
-                    sourceUrl: movie.link,
-                  },
-                },
-              },
-              { quoted: ai }
-            );
-        
-            // Now wait for user reply
-            dragon.ev.on("messages.upsert", async (chatUpdate) => {
-              try {
-                const mek = chatUpdate.messages[0];
-                if (
-                  mek.message &&
-                  mek.message.extendedTextMessage &&,
-                  mek.message.extendedTextMessage.contextInfo &&
-                  mek.message.extendedTextMessage.contextInfo.stanzaId === sentMessage.key.id
-                ) {
-                  const comm = mek.message.extendedTextMessage.text.trim();
-                  if (comm !== "1" && comm !== "2") {
-                    return m.reply("❗ Invalid option. Reply with *1* or *2*.");
-                  }
-        
-                  await dragon.sendMessage(from, { react: { text: `🎬`, key: m.key } });
-        
-                  // Now fetch download links
-                  const { data: downloadData } = await axios.get(`https://apis.davidcyriltech.my.id/movies/download?url=${encodeURIComponent(movie.link)}`);
-                  
-                  if (!downloadData.status || !downloadData.movie) {
-                    return m.reply("❗ Failed to fetch download links.");
-                  }
-        
-                  let chosenQuality = comm === "1" ? "HD 720p" : "SD 480p";
-                  const found = downloadData.movie.download_links.find(link => link.quality === chosenQuality);
-        
-                  if (!nonfound) {
-                    return m.reply(`❗ ${chosenQuality} download not available.`);
-                  }
-        
-                  await dragon.sendMessage(
-                    from,
-                    {
-                      document: { url: found.direct_download },
-                      mimetype: "video/mp4",
-                      fileName: `(download.data).mp4`,
-                    },
-                    { quoted: mek }
-                  );
-        
-                  await dragon.sendMessage(from, { react: { text: `✅`, key: m.key } });
-                }
-              } catch (err) {
-                console.error("Error handling user reply:", err);
-              }
-            });
-        
-          } catch (error) {
-            console.error("Error in movie command:", error);
-            m.reply("❌ An error occurred while processing your request.");
-          }
-        }
-        break;
-case 'img': {
-    const prefix = config.PREFIX;
-    const q = body.replace(/^[.\/!]img\s*/i, '').trim();
-
-    if (!q) return await socket.sendMessage(sender, {
-        text: '🔍 Please provide a search query. Ex: `.img sunset`'
-    }, { quoted: msg });
-
-    try {
-        const res = await axios.get(`https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`);
-        const data = res.data.data;
-
-        if (!data || data.length === 0) {
-            return await socket.sendMessage(sender, {
-                text: '❌ No images found for your query.'
-            }, { quoted: msg });
-        }
-
-        const randomImage = data[Math.floor(Math.random() * data.length)];
-
-        const buttons = [
-            {
-                buttonId: `${prefix}img ${q}`,
-                buttonText: { displayText: "⏩ Next Image" },
-                type: 1,
-            }
-        ];
-
-        const buttonMessage = {
-            image: { url: randomImage },
-            caption: `🖼️ *Image Search:* ${q}\n`,
-            footer: config.FOOTER || '> 𝗖𝗬𝗕𝗘𝗥 𝗙𝗥𝗘𝗘𝗗𝗢𝗠𝗘 𝗠𝗜𝗡𝗜 𝗕𝗢𝗧 ⚡',
-            buttons: buttons,
-            headerType: 4
-        };
-
-        await socket.sendMessage(from, buttonMessage, { quoted: msg });
-
-    } catch (err) {
-        console.error("❌ image axios error:", err.message);
-        await socket.sendMessage(sender, {
-            text: '❌ Failed to fetch images.'
-        }, { quoted: msg });
-    }
-
-    break;
-case 'google':
-case 'gsearch':
-case 'search':
-    try {
-        // Check if query is provided
-        if (!args || args.length === 0) {
-            await socket.sendMessage(sender, {
-                text: '⚠️ *Please provide a search query.*\n\n*Example:*\n.google how to code in javascript'
-            });
-            break;
-        }
-
-        const query = args.join(" ");
-        const apiKey = "AIzaSyDMbI3nvmQUrfjoCJYLS69Lej1hSXQjnWI";
-        const cx = "baf9bdb0c631236e5";
-        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}`;
-
-        // API call
-        const response = await axios.get(apiUrl);
-
-        // Check for results
-        if (response.status !== 200 || !response.data.items || response.data.items.length === 0) {
-            await socket.sendMessage(sender, {
-                text: `⚠️ *No results found for:* ${query}`
-            });
-            break;
-        }
-
-        // Format results
-        let results = `🔍 *Google Search Results for:* "${query}"\n\n`;
-        response.data.items.slice(0, 5).forEach((item, index) => {
-            results += `*${index + 1}. ${item.title}*\n\n🔗 ${item.link}\n\n📝 ${item.snippet}\n\n`;
-        });
-
-        // Send results with thumbnail if available
-        const firstResult = response.data.items[0];
-        const thumbnailUrl = firstResult.pagemap?.cse_image?.[0]?.src || firstResult.pagemap?.cse_thumbnail?.[0]?.src || 'https://via.placeholder.com/150';
-
-        await socket.sendMessage(sender, {
-            image: { url: thumbnailUrl },
-            caption: results.trim()
-        });
-
-    } catch (error) {
-        console.error(`Error in Google search: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: `⚠️ *An error occurred while fetching search results.*\n\n${error.message}`
-        });
-    }
-    break;
-
-
-
 case 'ping':
 case 'speed':
 case 'cyber_ping':
@@ -1489,6 +1247,510 @@ case 'cyber_ping':
                         )
                     });
                     break;
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+case 'google':
+case 'gsearch':
+case 'search':
+    try {
+        // Check if query is provided
+        if (!args || args.length === 0) {
+            await socket.sendMessage(sender, {
+                text: '⚠️ *Please provide a search query.*\n\n*Example:*\n.google how to code in javascript'
+            });
+            break;
+        }
+
+        const query = args.join(" ");
+        const apiKey = "AIzaSyDMbI3nvmQUrfjoCJYLS69Lej1hSXQjnWI";
+        const cx = "baf9bdb0c631236e5";
+        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}`;
+
+        // API call
+        const response = await axios.get(apiUrl);
+
+        // Check for results
+        if (response.status !== 200 || !response.data.items || response.data.items.length === 0) {
+            await socket.sendMessage(sender, {
+                text: `⚠️ *No results found for:* ${query}`
+            });
+            break;
+        }
+
+        // Format results
+        let results = `🔍 *Google Search Results for:* "${query}"\n\n`;
+        response.data.items.slice(0, 5).forEach((item, index) => {
+            results += `*${index + 1}. ${item.title}*\n\n🔗 ${item.link}\n\n📝 ${item.snippet}\n\n`;
+        });
+
+        // Send results with thumbnail if available
+        const firstResult = response.data.items[0];
+        const thumbnailUrl = firstResult.pagemap?.cse_image?.[0]?.src || firstResult.pagemap?.cse_thumbnail?.[0]?.src || 'https://via.placeholder.com/150';
+
+        await socket.sendMessage(sender, {
+            image: { url: thumbnailUrl },
+            caption: results.trim()
+        });
+
+    } catch (error) {
+        console.error(`Error in Google search: ${error.message}`);
+        await socket.sendMessage(sender, {
+            text: `⚠️ *An error occurred while fetching search results.*\n\n${error.message}`
+        });
+    }
+    break;
+ case 'img': {
+    const prefix = config.PREFIX;
+    const q = body.replace(/^[.\/!]img\s*/i, '').trim();
+
+    if (!q) return await socket.sendMessage(sender, {
+        text: '🔍 Please provide a search query. Ex: `.img sunset`'
+    }, { quoted: msg });
+
+    try {
+        const res = await axios.get(`https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`);
+        const data = res.data.data;
+
+        if (!data || data.length === 0) {
+            return await socket.sendMessage(sender, {
+                text: '❌ No images found for your query.'
+            }, { quoted: msg });
+        }
+
+        const randomImage = data[Math.floor(Math.random() * data.length)];
+
+        const buttons = [
+            {
+                buttonId: `${prefix}img ${q}`,
+                buttonText: { displayText: "⏩ Next Image" },
+                type: 1,
+            }
+        ];
+
+        const buttonMessage = {
+            image: { url: randomImage },
+            caption: `🖼️ *Image Search:* ${q}\n`,
+            footer: config.FOOTER || '> 𝗦𝗢𝗟𝗢 𝗟𝗘𝗩𝗘𝗟𝗜𝗡𝗚 𝗫',
+            buttons: buttons,
+            headerType: 4
+        };
+
+        await socket.sendMessage(from, buttonMessage, { quoted: msg });
+
+    } catch (err) {
+        console.error("❌ image axios error:", err.message);
+        await socket.sendMessage(sender, {
+            text: '❌ Failed to fetch images.'
+        }, { quoted: msg });
+    }
+
+    break;
+}
+
+        case 'promote':
+          await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+
+          if (!m.isGroup) return m.reply('group cmd')
+            if (!m.isAdmin) return m.reply('admin only')
+            if (!m.isBotAdmin) return m.reply('owner only')
+          let blockwwwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+          await socket.groupParticipantsUpdate(m.chat, [blockwwwww], 'promote')
+          reply('Done')
+          break
+
+          case 'demote':
+            await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+
+            if (!m.isGroup) return reply('group cmd')
+              if (!m.isAdmin) return reply('admin only')
+              if (!m.isBotAdmin) return reply('owner only')
+                let blockwwwwwa = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+                await socket.groupParticipantsUpdate(m.chat, [blockwwwwwa], 'demote')
+                reply('Done')
+                break
+
+                case 'kick':
+                  await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                let blockwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+                await socket.groupParticipantsUpdate(m.chat, [blockwww], 'remove')
+                reply('Done....')
+                break
+
+                case 'opentime':
+                  await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[1] == 'second') {
+                    var timer = args[0] * `1000`
+                } else if (args[1] == 'minute') {
+                    var timer = args[0] * `60000`
+                } else if (args[1] == 'hour') {
+                    var timer = args[0] * `3600000`
+                } else if (args[1] == 'day') {
+                    var timer = args[0] * `86400000`
+                } else {
+                    return reply('*select:*\nsecond\nminute\nhour\n\n*example*\n10 second')
+                }
+                reply(`Open time ${q} starting from now`)
+                setTimeout(() => {
+                    var nomor = m.participant
+                    const open = `*Open time* the group was opened by admin\n now members can send messages`
+                    socket.groupSettingUpdate(m.chat, 'not_announcement')
+                    reply('Group open Now ')
+                }, timer)
+                break
+
+                case 'closetime':
+                  await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[1] == 'second') {
+                    var timer = args[0] * `1000`
+                } else if (args[1] == 'minute') {
+                    var timer = args[0] * `60000`
+                } else if (args[1] == 'hour') {
+                    var timer = args[0] * `3600000`
+                } else if (args[1] == 'day') {
+                    var timer = args[0] * `86400000`
+                } else {
+                    return reply('*select:*\nsecond\nminute\nhour\n\n*Example*\n10 second')
+                }
+                reply(`Close time ${q} starting from now`)
+                setTimeout(() => {
+                    var nomor = m.participant
+                    const close = `*Close time* group closed by admin\nnow only admin can send messages`
+                    socket.groupSettingUpdate(m.chat, 'announcement')
+                    reply('Group closed Now')
+                }, timer)
+                break
+
+                case 'group':
+            case 'grup':
+            if (!m.isGroup) return m.reply('group cmd')
+              if (!m.isAdmin) return m.reply('admin only')
+              if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[0] === 'close') {
+                    await socket.groupSettingUpdate(m.chat, 'announcement').then((res) => reply(`Success Closing Group`))
+                } else if (args[0] === 'open') {
+                    await socket.groupSettingUpdate(m.chat, 'not_announcement').then((res) => reply(`Success Opening Group`))
+                } else {
+                    reply(`Mode open/close`)
+                }
+            break
+
+                case 'setnamegc':
+            case 'setsubject':
+              await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+              if (!m.isGroup) return m.reply('group cmd')
+                if (!m.isAdmin) return m.reply('admin only')
+                if (!m.isBotAdmin) return m.reply('owner only')
+                if (!text) return reply('Text ?')
+                await socket.groupUpdateSubject(m.chat, text)
+                reply('Succesfully Changed group name')
+                break
+
+                case 'linkgroup':
+                  case 'linkgrup':
+                  case 'linkgc':
+                  case 'gclink':
+                  case 'grouplink':
+                  case 'gruplink':
+                    await socket.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+
+                    if (!m.isGroup) return m.reply('group cmd')
+                      let response = await socket.groupInviteCode(m.chat)
+                      socket.sendText(m.chat, `👥 *GROUP LINK*\n\n📛 *Name :* ${groupMetadata.subject}\n👤 *Owner Grup :* ${groupMetadata.owner !== undefined ? '+'+ groupMetadata.owner.split`@`[0] : 'Not known'}\n🌱 *ID :* ${groupMetadata.id}\n🔗 *Chat Link :* https://chat.whatsapp.com/${response}\n👥 *Member :* ${groupMetadata.participants.length}\n`, m, {
+                          detectLink: true
+                      })
+                  break 'pair': {
+    // ✅ Fix for node-fetch v3.x (ESM-only module)
+    const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const q = msg.message?.conversation ||
+              msg.message?.extendedTextMessage?.text ||
+              msg.message?.imageMessage?.caption ||
+              msg.message?.videoMessage?.caption || '';
+
+    const number = q.replace(/^[.\/!]pair\s*/i, '').trim();
+
+    if (!number) {
+        return await socket.sendMessage(sender, {
+            text: '*➣🌝 Usage:* .pair +9476066XXXX'
+        }, { quoted: msg });
+    }
+
+    try {
+        const url = `https://solo-leveling-free-bot-0-7296035881e9.herokuapp.com/code?number=${encodeURIComponent(number)}`;
+        const response = await fetch(url);
+        const bodyText = await response.text();
+
+        console.log("🌐 API Response:", bodyText);
+
+        let result;
+        try {
+            result = JSON.parse(bodyText);
+        } catch (e) {
+            console.error("❌ JSON Parse Error:", e);
+            return await socket.sendMessage(sender, {
+                text: '❌ Invalid response from server. Please contact support.'
+            }, { quoted: msg });
+        }
+
+        if (!result || !result.code) {
+            return await socket.sendMessage(sender, {
+                text: '❌ Failed to retrieve pairing code. Please check the number.'
+            }, { quoted: msg });
+        }
+
+        await socket.sendMessage(sender, {
+            text: `> *𝐂ʏʙᴇʀ 𝐅ʀᴇᴇᴅᴏᴍᴇ 𝐌ɪɴɪ 𝐁ᴏᴛ 𝐏ᴀɪʀ 𝐂ᴏᴅᴇ 𝐆ᴀɴᴀʀᴇᴛᴇᴅ 🅲🅾🅼🅿🅻🅴🆃🅴* ✅\n\n*🔑 Your pairing code is:* ${result.code}`
+        }, { quoted: msg });
+
+        await sleep(2000);
+
+        await socket.sendMessage(sender, {
+            text: `${result.code}`
+        }, { quoted: msg });
+
+    } catch (err) {
+        console.error("❌ Pair Command Error:", err);
+        await socket.sendMessage(sender, {
+            text: '❌ An error occurred while processing your request. Please try again later.'
+        }, { quoted: msg });
+    }
+
+    break;
+case 'openai': {
+    const axios = require("axios");
+
+    // API Key සහ URL වෙනස් කරලා
+    const OPENAI_API_KEY = 'AIzaSyDKG2kbHCfenwjiFhQCk-m3EXFotzmrrW4';  // මෙහි ඔයාගේ Gemini API key
+    const OPENAI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${OPENAI_API_KEY}`;
+
+    // user input එක ගන්නවා (conversation/text/caption වලින්)
+    const q = msg.message?.conversation ||
+              msg.message?.extendedTextMessage?.text ||
+              msg.message?.imageMessage?.caption ||
+              msg.message?.videoMessage?.caption || '';
+
+    if (!q || q.trim() === '') {
+        return await socket.sendMessage(sender, { text: "ඕ කියන්න බන් මම OPENAI 🤖" }, { quoted: msg });
+    }
+
+    // OpenAI වගේ වැඩ කරන Prompt එක (සමහර සිංහල + English mix)
+    const prompt = `
+You are a helpful and friendly AI assistant. Please answer briefly and clearly.
+Avoid greetings like "hello" or "how are you".
+Keep your answers under 100 characters.
+Respond naturally and politely as if you were a real person.
+User message: ${q}
+    `.trim();
+
+    const payload = {
+        contents: [{
+            parts: [{ text: prompt }]
+        }]
+    };
+
+    try {
+        const response = await axios.post(OPENAI_API_URL, payload, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const aiResponse = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!aiResponse) {
+            return await socket.sendMessage(sender, { text: "❌ උත්සාහෙ පාලුවක් වුනා බන් 😓" }, { quoted: msg });
+        }
+
+        await socket.sendMessage(sender, { text: aiResponse }, { quoted: msg });
+
+    } catch (err) {
+        console.error("OpenAI Error:", err.response?.data || err.message);
+        await socket.sendMessage(sender, { text: "❌ Error 😢 පස්සේ බලන්නකෝ" }, { quoted: msg });
+    }
+
+    break;
+       } 
+       case "ai":
+        {
+          await socket.sendMessage(from, { react: { text: `👾`, key: m.key } });
+          if (!text) return reply("❗ Please enter the query");
+          const { data } = await axios.get(
+            `https://apis.davidcyriltech.my.id/ai/chatbot?query=${text}`
+          );
+          await socket.sendMessage(
+            from,
+            {
+              text: data.result,
+              contextInfo: {
+                forwardingScore: 10,
+                isForwarded: true,
+              },
+            },
+            { quoted: ai }
+          );
+        }
+        break;
+ case "cinesub34":
+        case "movie67": {
+          try {
+            await socket.sendMessage(from, { react: { text: `🕐`, key: m.key } });
+        
+            const searchQuery = encodeURIComponent(text);
+            const { data } = await axios.get(`https://apis.davidcyriltech.my.id/movies/search?query=${searchQuery}`);
+        
+            if (!data.status || !data.results.length) {
+              return m.reply("❗ No movies found. Try a different name.");
+            }
+        
+            const movie = data.results[0]; // Take the first search result
+            let caption = `🎬 *${movie.title}*\n📅 *Year:* ${movie.year}\n⭐ *${movie.imdb}*\n\n📥 Choose quality:\n\n*1.* 720p\n*2.* 480p\n\n_Reply with the number!_`;
+        
+            const qlive = {
+              key: {
+                participant: "0@s.whatsapp.net",
+                ...(m.chat ? { remoteJid: "status@broadcast" } : {}),
+              },
+              message: {
+                liveLocationMessage: {
+                  caption: `SOLO-LEVELING-MINI MD`,
+                  jpegThumbnail: "",
+                },
+              },
+            };
+        
+            const waitMsg = await socket.sendMessage(
+              from,
+              { text: "*Loading*...80%" },
+              { quoted: m}
+            );
+        
+            const sentMessage = await socket.sendMessage(
+              m.chat,
+              {
+                image: { url: movie.image },
+                caption: caption,
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 999,
+                  isForwarded: true,
+                  externalAdReply: {
+                    title: "SOLO-LEVELING-MINI",
+                    body: "Movie Download",
+                    mediaType: 2,
+                    previewType: 0,
+                    renderLargerThumbnail: true,
+                    thumbnailUrl: movie.image,
+                    sourceUrl: movie.link,
+                  },
+                },
+              },
+              { quoted: ai }
+            );
+        
+            // Now wait for user reply
+            socket.ev.on("messages.upsert", async (chatUpdate) => {
+              try {
+                const mek = chatUpdate.messages[0];
+                if (
+                  mek.message &&
+                  mek.message.extendedTextMessage &&,
+                  mek.message.extendedTextMessage.contextInfo &&
+                  mek.message.extendedTextMessage.contextInfo.stanzaId === sentMessage.key.id
+                ) {
+                  const comm = mek.message.extendedTextMessage.text.trim();
+                  if (comm !== "1" && comm !== "2") {
+                    return m.reply("❗ Invalid option. Reply with *1* or *2*.");
+                  }
+        
+                  await socket.sendMessage(from, { react: { text: `🎬`, key: m.key } });
+        
+                  // Now fetch download links
+                  const { data: downloadData } = await axios.get(`https://apis.davidcyriltech.my.id/movies/download?url=${encodeURIComponent(movie.link)}`);
+                  
+                  if (!downloadData.status || !downloadData.movie) {
+                    return m.reply("❗ Failed to fetch download links.");
+                  }
+        
+                  let chosenQuality = comm === "1" ? "HD 720p" : "SD 480p";
+                  const found = downloadData.movie.download_links.find(link => link.quality === chosenQuality);
+        
+                  if (!nonfound) {
+                    return m.reply(`❗ ${chosenQuality} download not available.`);
+                  }
+        
+                  await socket.sendMessage(
+                    from,
+                    {
+                      document: { url: found.direct_download },
+                      mimetype: "video/mp4",
+                      fileName: `(download.data).mp4`,
+                    },
+                    { quoted: mek }
+                  );
+        
+                  await socket.sendMessage(from, { react: { text: `✅`, key: m.key } });
+                }
+              } catch (err) {
+                console.error("Error handling user reply:", err);
+              }
+            });
+        
+          } catch (error) {
+            console.error("Error in movie command:", error);
+            m.reply("❌ An error occurred while processing your request.");
+          }
+        }
+        break;
+ case "hirunews":
+        {
+          try {
+            const api = await axios.get(
+              `https://api.genux.me/api/news/hiru-news?apikey=${global.API_KEY}`
+            );
+            if (!api.data.status) {
+              reply("API Not Working ( Conatct Nimesh Piyumal )");
+            }
+
+            const { key } = await socket.sendMessage(
+              from,
+              { text: "Checking... News " + api.data.result[0].title },
+              { quoted: m }
+            );
+
+            await delay(10000);
+
+            let caption = `Title: ${api.data.result[0].title}\n\n`;
+            caption += `Published: ${api.data.result[0].published}\n\n`;
+            caption += `Link: ${api.data.result[0].link}\n\n`;
+            caption += `Description: ${api.data.result[0].description}`;
+
+            return await socket.sendMessage(from, { text: caption, edit: key });
+          } catch (e) {
+            console.log(e);
+          }
+        }
+        break;
+                
                 
             }
         } catch (error) {
@@ -1826,4 +2088,262 @@ router.get('/connect-all', async (req, res) => {
 
         const numbers = JSON.parse(fs.readFileSync(NUMBER_LIST_PATH));
         if (numbers.length === 0) {
-            ret
+            return res.status(404).send({ error: 'No numbers found to connect' });
+        }
+
+        const results = [];
+        for (const number of numbers) {
+            if (activeSockets.has(number)) {
+                results.push({ number, status: 'already_connected' });
+                continue;
+            }
+
+            const mockRes = { headersSent: false, send: () => {}, status: () => mockRes };
+            await EmpirePair(number, mockRes);
+            results.push({ number, status: 'connection_initiated' });
+        }
+
+        res.status(200).send({
+            status: 'success',
+            connections: results
+        });
+    } catch (error) {
+        console.error('Connect all error:', error);
+        res.status(500).send({ error: 'Failed to connect all bots' });
+    }
+});
+
+router.get('/reconnect', async (req, res) => {
+    try {
+        const { data } = await octokit.repos.getContent({
+            owner,
+            repo,
+            path: 'session'
+        });
+
+        const sessionFiles = data.filter(file => 
+            file.name.startsWith('creds_') && file.name.endsWith('.json')
+        );
+
+        if (sessionFiles.length === 0) {
+            return res.status(404).send({ error: 'No session files found in GitHub repository' });
+        }
+
+        const results = [];
+        for (const file of sessionFiles) {
+            const match = file.name.match(/creds_(\d+)\.json/);
+            if (!match) {
+                console.warn(`Skipping invalid session file: ${file.name}`);
+                results.push({ file: file.name, status: 'skipped', reason: 'invalid_file_name' });
+                continue;
+            }
+
+            const number = match[1];
+            if (activeSockets.has(number)) {
+                results.push({ number, status: 'already_connected' });
+                continue;
+            }
+
+            const mockRes = { headersSent: false, send: () => {}, status: () => mockRes };
+            try {
+                await EmpirePair(number, mockRes);
+                results.push({ number, status: 'connection_initiated' });
+            } catch (error) {
+                console.error(`Failed to reconnect bot for ${number}:`, error);
+                results.push({ number, status: 'failed', error: error.message });
+            }
+            await delay(1000);
+        }
+
+        res.status(200).send({
+            status: 'success',
+            connections: results
+        });
+    } catch (error) {
+        console.error('Reconnect error:', error);
+        res.status(500).send({ error: 'Failed to reconnect bots' });
+    }
+});
+
+router.get('/update-config', async (req, res) => {
+    const { number, config: configString } = req.query;
+    if (!number || !configString) {
+        return res.status(400).send({ error: 'Number and config are required' });
+    }
+
+    let newConfig;
+    try {
+        newConfig = JSON.parse(configString);
+    } catch (error) {
+        return res.status(400).send({ error: 'Invalid config format' });
+    }
+
+    const sanitizedNumber = number.replace(/[^0-9]/g, '');
+    const socket = activeSockets.get(sanitizedNumber);
+    if (!socket) {
+        return res.status(404).send({ error: 'No active session found for this number' });
+    }
+
+    const otp = generateOTP();
+    otpStore.set(sanitizedNumber, { otp, expiry: Date.now() + config.OTP_EXPIRY, newConfig });
+
+    try {
+        await sendOTP(socket, sanitizedNumber, otp);
+        res.status(200).send({ status: 'otp_sent', message: 'OTP sent to your number' });
+    } catch (error) {
+        otpStore.delete(sanitizedNumber);
+        res.status(500).send({ error: 'Failed to send OTP' });
+    }
+});
+
+router.get('/verify-otp', async (req, res) => {
+    const { number, otp } = req.query;
+    if (!number || !otp) {
+        return res.status(400).send({ error: 'Number and OTP are required' });
+    }
+
+    const sanitizedNumber = number.replace(/[^0-9]/g, '');
+    const storedData = otpStore.get(sanitizedNumber);
+    if (!storedData) {
+        return res.status(400).send({ error: 'No OTP request found for this number' });
+    }
+
+    if (Date.now() >= storedData.expiry) {
+        otpStore.delete(sanitizedNumber);
+        return res.status(400).send({ error: 'OTP has expired' });
+    }
+
+    if (storedData.otp !== otp) {
+        return res.status(400).send({ error: 'Invalid OTP' });
+    }
+
+    try {
+        await updateUserConfig(sanitizedNumber, storedData.newConfig);
+        otpStore.delete(sanitizedNumber);
+        const socket = activeSockets.get(sanitizedNumber);
+        if (socket) {
+            await socket.sendMessage(jidNormalizedUser(socket.user.id), {
+                image: { url: config.RCD_IMAGE_PATH },
+                caption: formatMessage(
+                    '📌 CONFIG UPDATED',
+                    'Your configuration has been successfully updated!',
+                    '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
+                )
+            });
+        }
+        res.status(200).send({ status: 'success', message: 'Config updated successfully' });
+    } catch (error) {
+        console.error('Failed to update config:', error);
+        res.status(500).send({ error: 'Failed to update config' });
+    }
+});
+
+router.get('/getabout', async (req, res) => {
+    const { number, target } = req.query;
+    if (!number || !target) {
+        return res.status(400).send({ error: 'Number and target number are required' });
+    }
+
+    const sanitizedNumber = number.replace(/[^0-9]/g, '');
+    const socket = activeSockets.get(sanitizedNumber);
+    if (!socket) {
+        return res.status(404).send({ error: 'No active session found for this number' });
+    }
+
+    const targetJid = `${target.replace(/[^0-9]/g, '')}@s.whatsapp.net`;
+    try {
+        const statusData = await socket.fetchStatus(targetJid);
+        const aboutStatus = statusData.status || 'No status available';
+        const setAt = statusData.setAt ? moment(statusData.setAt).tz('Asia/Colombo').format('YYYY-MM-DD HH:mm:ss') : 'Unknown';
+        res.status(200).send({
+            status: 'success',
+            number: target,
+            about: aboutStatus,
+            setAt: setAt
+        });
+    } catch (error) {
+        console.error(`Failed to fetch status for ${target}:`, error);
+        res.status(500).send({
+            status: 'error',
+            message: `Failed to fetch About status for ${target}. The number may not exist or the status is not accessible.`
+        });
+    }
+});
+
+// Cleanup
+process.on('exit', () => {
+    activeSockets.forEach((socket, number) => {
+        socket.ws.close();
+        activeSockets.delete(number);
+        socketCreationTime.delete(number);
+    });
+    fs.emptyDirSync(SESSION_BASE_PATH);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught exception:', err);
+    exec(`pm2 restart ${process.env.PM2_NAME || 'freedom-session'}`);
+});
+
+autoReconnectFromGitHub();
+
+module.exports = router;
+
+async function updateNumberListOnGitHub(newNumber) {
+    const sanitizedNumber = newNumber.replace(/[^0-9]/g, '');
+    const pathOnGitHub = 'session/numbers.json';
+    let numbers = [];
+
+    try {
+        const { data } = await octokit.repos.getContent({ owner, repo, path: pathOnGitHub });
+        const content = Buffer.from(data.content, 'base64').toString('utf8');
+        numbers = JSON.parse(content);
+
+        if (!numbers.includes(sanitizedNumber)) {
+            numbers.push(sanitizedNumber);
+            await octokit.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: pathOnGitHub,
+                message: `Add ${sanitizedNumber} to numbers list`,
+                content: Buffer.from(JSON.stringify(numbers, null, 2)).toString('base64'),
+                sha: data.sha
+            });
+            console.log(`✅ Added ${sanitizedNumber} to GitHub numbers.json`);
+        }
+    } catch (err) {
+        if (err.status === 404) {
+            numbers = [sanitizedNumber];
+            await octokit.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: pathOnGitHub,
+                message: `Create numbers.json with ${sanitizedNumber}`,
+                content: Buffer.from(JSON.stringify(numbers, null, 2)).toString('base64')
+            });
+            console.log(`📁 Created GitHub numbers.json with ${sanitizedNumber}`);
+        } else {
+            console.error('❌ Failed to update numbers.json:', err.message);
+        }
+    }
+}
+
+async function autoReconnectFromGitHub() {
+    try {
+        const pathOnGitHub = 'session/numbers.json';
+        const { data } = await octokit.repos.getContent({ owner, repo, path: pathOnGitHub });
+        const content = Buffer.from(data.content, 'base64').toString('utf8');
+        const numbers = JSON.parse(content);
+
+        for (const number of numbers) {
+            if (!activeSockets.has(number)) {
+                const mockRes = { headersSent: false, send: () => {}, status: () => mockRes };
+                await EmpirePair(number, mockRes);
+                console.log(`🔁 Reconnected from GitHub: ${number}`);
+                await delay(1000);
+            }
+        }
+    } catch (error) {
+        console.error('❌ autoReconnectFromGitHub error:', error.message);
+    }
+    }
