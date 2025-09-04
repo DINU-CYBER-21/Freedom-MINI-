@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: black;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .box {
+      width: 320px;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 25px #00f2ff;
+      z-index: 2;
+      backdrop-filter: blur(5px);
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; text-shadow: 0 0 5px #0ff, 0 0 20px #0ff; }
+    }
+
+    h3, h6 {
+      color: #00f2ff;
+      animation: flicker 2s infinite alternate;
+      margin: 10px 0;
+    }
+
+    .input-container {
+      display: flex;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .input-container input,
+    .input-container button {
+      height: 3rem;
+      font-size: 1rem;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+      transition: none !important;
+      transform: none !important;
+      resize: none !important;
+      appearance: none;
+    }
+
+    .input-container input {
+      width: 70%;
+      border-radius: 0.8rem 0 0 0.8rem;
+      background: #e0f7ff;
+      color: #000;
+      padding-left: 1rem;
+    }
+
+    .input-container button {
+      width: 30%;
+      border-radius: 0 0.8rem 0.8rem 0;
+      background: #00bfff;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .input-container button:hover {
+      background: #00ffff;
+      color: #000;
+    }
+
+    a.centered-text {
+      color: white;
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    /* Video background */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      opacity: 0.5;
+    }
+
+    /* Sound control button */
+    .sound-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(0, 191, 255, 0.7);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 0 10px #00f2ff;
+      transition: all 0.3s;
+    }
+
+    .sound-btn:hover {
+      background: rgba(0, 255, 255, 0.9);
+      transform: scale(1.1);
+    }
+
+    .sound-btn i {
+      color: white;
+      font-size: 20px;
+    }
+
+    /* Neon dot overlay */
+    .neon-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #00ffff;
+      border-radius: 50%;
+      animation: rise 5s linear infinite;
+      opacity: 0.6;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0.2;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Video Background -->
+  <video class="video-background" id="bgVideo" autoplay muted loop>
+    <source src="https://files.catbox.moe/dggveb.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+  
+  <!-- Neon dot overlay -->
+  <div class="neon-overlay" id="dots"></div>
+
+  <!-- Sound control button -->
+  <div class="sound-btn" id="soundBtn">
+    <i class="fas fa-volume-mute" id="soundIcon"></i>
+  </div>
+
+  <div class="container">
+    <div class="box" id="box">
+      <div id="text">
+        <i class="fa fa-user" style="color:#00ffff;"></i>
+        <h3>🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️</h3>
+        <h6> CREACT BY CYBER DINU </h6>
+        <h6>🔢 Enter your number with country code</h6>
+
+        <div class="input-container">
+          <input placeholder="9476xxxxxxx" type="number" id="number">
+          <button id="submit">Submit</button>
+        </div>
+
+        <a id="waiting-message" class="centered-text" style="display: none;">Please wait a while...</a>
+        <main id="pair"></main>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    const video = document.getElementById("bgVideo");
+    const soundBtn = document.getElementById("soundBtn");
+    const soundIcon = document.getElementById("soundIcon");
+
+    // Sound control functionality
+    soundBtn.addEventListener("click", () => {
+      if (video.muted) {
+        video.muted = false;
+        soundIcon.classList.remove("fa-volume-mute");
+        soundIcon.classList.add("fa-volume-up");
+      } else {
+        video.muted = true;
+        soundIcon.classList.remove("fa-volume-up");
+        soundIcon.classList.add("fa-volume-mute");
+      }
+    });
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:blue;font-weight:bold";
+      obj.size = "5";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:white;font-weight-bold";
+        obj.size = "5";
+      }, 500);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (!c.value) {
+        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Invalid Number</a><br><br>';
+      } else {
+        const number = c.value.replace(/[^0-9]/g, "");
+        c.type = "text";
+        c.value = "+" + number;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:white;font-weight:bold">Please Wait...</a><br><br>';
+        let { data } = await axios(`/code?number=${number}`);
+        let code = data.code || "Service Unavailable";
+        a.innerHTML = `<font id="copy" onclick="Copy()" style="color:red;font-weight:bold" size="5">CODE: <span style="color:white;">${code}</span></font><br><br><br>`;
+      }
+    });
+
+    // Dot animation
+    const bg = document.getElementById("dots");
+    for (let i = 0; i < 80; i++) {
+      const dot = document.createElement("div");
+      dot.classList.add("dot");
+      dot.style.left = Math.random() * 100 + "vw";
+      dot.style.animationDuration = 3 + Math.random() * 5 + "s";
+      dot.style.animationDelay = Math.random() * 5 + "s";
+      bg.appendChild(dot);
+    }
+  </script>
+</body>
+</html>
