@@ -374,14 +374,9 @@ function setupCommandHandlers(socket, number) {
             }
         }
 
-     try {
-            fs.readdirSync("./plugins/").forEach((plugin) => {
-     if (path.extname(plugin).toLowerCase() == ".js") {
-     require("./plugins/" + plugin);
-}
-});
-     if (!command) return;
-     
+        if (!command) return;
+
+     try {;
             switch (command) {
                 case 'alive': {
     const startTime = socketCreationTime.get(number) || Date.now();
@@ -747,51 +742,6 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
-                case 'cricket':
-    try {
-        console.log('Fetching cricket news from API...');
-        
-        const response = await fetch('https://suhas-bro-api.vercel.app/news/cricbuzz');
-        console.log(`API Response Status: ${response.status}`);
-
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('API Response Data:', JSON.stringify(data, null, 2));
-
-       
-        if (!data.status || !data.result) {
-            throw new Error('Invalid API response structure: Missing status or result');
-        }
-
-        const { title, score, to_win, crr, link } = data.result;
-        if (!title || !score || !to_win || !crr || !link) {
-            throw new Error('Missing required fields in API response: ' + JSON.stringify(data.result));
-        }
-
-       
-        console.log('Sending message to user...');
-        await socket.sendMessage(sender, {
-            text: formatMessage(
-                '🏏 FREEDOM BOT CEICKET NEWS🏏',
-                `📢 *${title}*\n\n` +
-                `🏆 *mark*: ${score}\n` +
-                `🎯 *to win*: ${to_win}\n` +
-                `📈 *now speed*: ${crr}\n\n` +
-                `🌐 *link*: ${link}`,
-                '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
-            )
-        });
-        console.log('Message sent successfully.');
-    } catch (error) {
-        console.error(`Error in 'news' case: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: '⚠️ දැන්නම් හරි යන්නම ඕන 🙌.'
-        });
-    }
-                    break;
                     case 'csong': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
@@ -875,8 +825,52 @@ function setupCommandHandlers(socket, number) {
         await socket.sendMessage(sender, { text: "*`Error`*" });
     }
 
-    break;
+                break;
+                case 'cricket':
+    try {
+        console.log('Fetching cricket news from API...');
+        
+        const response = await fetch('https://suhas-bro-api.vercel.app/news/cricbuzz');
+        console.log(`API Response Status: ${response.status}`);
 
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('API Response Data:', JSON.stringify(data, null, 2));
+
+       
+        if (!data.status || !data.result) {
+            throw new Error('Invalid API response structure: Missing status or result');
+        }
+
+        const { title, score, to_win, crr, link } = data.result;
+        if (!title || !score || !to_win || !crr || !link) {
+            throw new Error('Missing required fields in API response: ' + JSON.stringify(data.result));
+        }
+
+       
+        console.log('Sending message to user...');
+        await socket.sendMessage(sender, {
+            text: formatMessage(
+                '🏏 FREEDOM BOT CEICKET NEWS🏏',
+                `📢 *${title}*\n\n` +
+                `🏆 *mark*: ${score}\n` +
+                `🎯 *to win*: ${to_win}\n` +
+                `📈 *now speed*: ${crr}\n\n` +
+                `🌐 *link*: ${link}`,
+                '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
+            )
+        });
+        console.log('Message sent successfully.');
+    } catch (error) {
+        console.error(`Error in 'news' case: ${error.message}`);
+        await socket.sendMessage(sender, {
+            text: '⚠️ දැන්නම් හරි යන්නම ඕන 🙌.'
+        });
+    }
+                    break;
                 case 'gossip':
     try {
         
