@@ -376,7 +376,7 @@ function setupCommandHandlers(socket, number) {
 
         if (!command) return;
 
-     try {;
+        try {
             switch (command) {
                 case 'alive': {
     const startTime = socketCreationTime.get(number) || Date.now();
@@ -738,10 +738,8 @@ function setupCommandHandlers(socket, number) {
         await socket.sendMessage(sender, {
             text: '⚠️ සොබාදහම කලබල වෙලා api ඩව්න් වෙලා 😒❗'
         });
-    }           
-                    
-                break;
-          }             
+    }
+                    break;
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
