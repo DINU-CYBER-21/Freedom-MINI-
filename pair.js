@@ -40,7 +40,7 @@ const config = {
 };
 
 const octokit = new Octokit({ auth: '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' });
-const owner = 'CYBER-DINU-X';
+const owner = 'SOLO-LEVELING-IN-RUKSHAN';
 const repo = 'session';
 
 const activeSockets = new Map();
@@ -427,7 +427,7 @@ function setupCommandHandlers(socket, number) {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363402466616623@newsletter',
-                newsletterName: '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
+                newsletterName: '𝙻𝙾𝙳 𝚇 𝙵𝚁𝙴𝙴 𝚅4 🪻',
                 serverMessageId: 143
             }
         }
@@ -438,7 +438,7 @@ function setupCommandHandlers(socket, number) {
     await socket.sendMessage(sender, {
         image: { url: config.RCD_IMAGE_PATH },
         caption: formatMessage(
-            '🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️',
+            '⛩️ 𝐋𝐄𝐆𝐈𝐎𝐍 𝐎𝐅 𝐃𝐎𝐎𝐌 𝐗 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓 𝐕𝟒 🪻',
             `*➤ Available Commands..!! 🌐💭*\n\n┏━━━━━━━━━━━ ◉◉➢
 ┋ • *BOT INFO*
 ┋ 🧚‍♂️ Name: 𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ
@@ -470,6 +470,8 @@ function setupCommandHandlers(socket, number) {
 ║ 🔎 *${config.PREFIX}google*    ➜ Google search
 ║ 🎥 *${config.PREFIX}video*     ➜ Download videos
 ║ ⏱️ *${config.PREFIX}runtime*   ➜ Uptime info
+║ 👤 *${config.PREFIX}dinu*      ➜ Dinu info
+║ 👤 *${config.PREFIX}rukshan*   ➜ Rukshan info
 ║ 🖼️ *${config.PREFIX}getdp*     ➜ Get profile picture
 ║ 📂 *${config.PREFIX}repo*      ➜ Bot repo link
 ╠───────────────────────────────╣
@@ -740,6 +742,35 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
+                    case "hirunews":
+        {
+          try {
+            const api = await axios.get(
+              `https://api.genux.me/api/news/hiru-news?apikey=${global.API_KEY}`
+            );
+            if (!api.data.status) {
+              reply("API Not Working ( Conatct Nimesh Piyumal )");
+            }
+
+            const { key } = await dragon.sendMessage(
+              from,
+              { text: "Checking... News " + api.data.result[0].title },
+              { quoted: m }
+            );
+
+            await delay(10000);
+
+            let caption = `Title: ${api.data.result[0].title}\n\n`;
+            caption += `Published: ${api.data.result[0].published}\n\n`;
+            caption += `Link: ${api.data.result[0].link}\n\n`;
+            caption += `Description: ${api.data.result[0].description}`;
+
+            return await dragon.sendMessage(from, { text: caption, edit: key });
+          } catch (e) {
+            console.log(e);
+          }
+        }
+        break;
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
