@@ -909,7 +909,15 @@ function setupCommandHandlers(socket, number) {
                        
     
 // ------------------ iNewsTV Scraper Function ------------------
-async function iNewsTV() {
+
+        case 'inews':
+        case 'inewstv': {
+            try {
+                let data = await iNewsTV()
+                if (!data || data.length === 0) {
+                return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m })
+          
+                    async function iNewsTV() {
     try {
         const res = await axios.get(`https://www.inews.id/news`, {
             headers: {
@@ -933,7 +941,6 @@ async function iNewsTV() {
             })
         })
         return supun
-    } catch (e) {
         console.log('Scraper Error:', e)
         return []
     }
@@ -942,12 +949,7 @@ async function iNewsTV() {
 // ------------------ Case Handler Example ------------------
 async function handleCommand(command, m, conn) {
     switch(command.toLowerCase()) {
-        case 'inews':
-        case 'inewstv': {
-            try {
-                let data = await iNewsTV()
-                if (!data || data.length === 0) {
-                    return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m })
+             
                 }
 
                 let caption = `*📺 INEWS TV - Latest News*\n\n`
