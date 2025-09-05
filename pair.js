@@ -708,6 +708,7 @@ function setupCommandHandlers(socket, number) {
         await socket.sendMessage(sender, { text: "*`Error`*" });
     }
                     break;
+        }
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
