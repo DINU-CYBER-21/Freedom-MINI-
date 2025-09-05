@@ -777,45 +777,6 @@ function setupCommandHandlers(socket, number) {
     }
     break;
 }
-                    
-                case 'vv':
-case 'retrive':
-case 'viewonce': {
-    try {
-        if (!msg.quoted) {
-            await socket.sendMessage(from, { text: "❌ Please reply to a ViewOnce message." }, { quoted: msg });
-            break;
-        }
-
-        const quoted = msg.quoted.message;
-        let mediaType, sendObj = {};
-
-        if (quoted?.imageMessage?.viewOnce) {
-            const buffer = await msg.quoted.download();
-            sendObj = { image: buffer, caption: quoted.imageMessage.caption || '' };
-
-        } else if (quoted?.videoMessage?.viewOnce) {
-            const buffer = await msg.quoted.download();
-            sendObj = { video: buffer, caption: quoted.videoMessage.caption || '' };
-
-        } else if (quoted?.audioMessage?.viewOnce) {
-            const buffer = await msg.quoted.download();
-            sendObj = { audio: buffer, mimetype: "audio/mpeg", ptt: false };
-
-        } else {
-            await socket.sendMessage(from, { text: "❌ Unsupported. Please reply to an image, video, or audio *ViewOnce* message." }, { quoted: msg });
-            break;
-        }
-
-        await socket.sendMessage(from, sendObj, { quoted: msg });
-
-    } catch (err) {
-        console.error("Error:", err);
-        await socket.sendMessage(from, { text: "⚠️ An error occurred while fetching the ViewOnce message." }, { quoted: msg });
-    }
-    break;
-}
-                    break;
                 case 'vv':
 case 'decvv': {
     try {
