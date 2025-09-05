@@ -1133,6 +1133,66 @@ break;
     }
                   break;
                  }
+                    case 'pronhub': {          
+    const q = msg.message?.conversation || 
+              msg.message?.extendedTextMessage?.text || 
+              msg.message?.imageMessage?.caption || 
+              msg.message?.videoMessage?.caption || '';      
+
+    if (!q || q.trim() === '') {         
+        return await socket.sendMessage(sender, { text: '*Need query for search pronhub*' });     
+    }      
+
+    try {         
+       
+        const { data } = await axios.get(`https://phdl-api-thenux.netlify.app/api/search?q=${encodeURIComponent(q)}`);
+        const results = data.results;
+
+        if (!results || results.length === 0) {             
+            return await socket.sendMessage(sender, { text: '*No results found*' });         
+        }          
+
+        const first = results[0];
+        const url = first.url;
+        const dina = first.title;
+        const image = first.thumbnail;
+
+        const desc = `🎬 Title - ${dina}\n🏷️ URL - ${url}\n\n© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴛʜᴇ ᴅᴀʀᴋ ᴛᴇᴄʜ ᴢᴏɴᴇ`;         
+
+        await socket.sendMessage(sender, {             
+            image: { url: image },             
+            caption: desc,         
+        }, { quoted: msg });          
+
+        await socket.sendMessage(sender, { react: { text: '⬇️', key: msg.key } });          
+
+        
+        const { data: down } = await axios.get(`https://phdl-api-thenux.netlify.app/api/download?url=${encodeURIComponent(url)}`);
+        const videos = down.videoInfo?.data?.videos;          
+
+        if (!videos || videos.length === 0) {
+            return await socket.sendMessage(sender, { text: "*Download link not found*" });
+        }
+
+ 
+        const bestLink = videos[0].url;
+        const quality = videos[0].quality;
+
+        await socket.sendMessage(sender, { react: { text: '⬆️', key: msg.key } });          
+
+        await socket.sendMessage(sender, {             
+            video: { url: bestLink },             
+            mimetype: "video/mp4",             
+            caption: `${dina} (📹 ${quality})`        
+        }, { quoted: msg });      
+
+    } catch (err) {         
+        console.error("Pronhub Plugin Error:", err);         
+        await socket.sendMessage(sender, { text: "*Error fetching data*" });     
+    }      
+
+    break; 		
+                    }
                  case 'now':
                     await socket.sendMessage(sender, {
                         image: { url: config.RCD_IMAGE_PATH },
