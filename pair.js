@@ -906,67 +906,55 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
-                    case 'song2': {
+                       case 'google':
+case 'gsearch':
+case 'search':
     try {
-        const q = text.split(" ").slice(1).join(" ").trim();
-        if (!q) {
-            await socket.sendMessage(sender, { text: '*🚫 Please enter a song name to search.*' });
-            return;
+        // Check if query is provided
+        if (!args || args.length === 0) {
+            await socket.sendMessage(sender, {
+                text: '⚠️ *Please provide a search query.*\n\n*Example:*\n.google how to code in javascript'
+            });
+            break;
         }
 
-        const searchResults = await yts(q);
-        if (!searchResults.videos.length) {
-            await socket.sendMessage(sender, { text: '*🚩 Result Not Found*' });    
-            return;
+        const query = args.join(" ");
+        const apiKey = "AIzaSyDMbI3nvmQUrfjoCJYLS69Lej1hSXQjnWI";
+        const cx = "baf9bdb0c631236e5";
+        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}`;
+
+        // API call
+        const response = await axios.get(apiUrl);
+
+        // Check for results
+        if (response.status !== 200 || !response.data.items || response.data.items.length === 0) {
+            await socket.sendMessage(sender, {
+                text: `⚠️ *No results found for:* ${query}`
+            });
+            break;
         }
 
-        const video = searchResults.videos[0];
-
-        // ==== API CALL ====
-        const apiUrl = `${api}/download/ytmp3?url=${encodeURIComponent(video.url)}&apikey=${apikey}`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (!data.status || !data.data?.result) {
-            await socket.sendMessage(sender, { text: '*🚩 Download Error. Please try again later.*' });
-            return;
-        }
-
-        const { title, uploader, duration, quality, format, thumbnail, download } = data.data.result;
-
-        const titleText = '*FREEDOM SONG DL*';
-        const content = `┏━━━━━━━━━━━━━━━━\n` +
-            `┃📝 \`Title\` : ${video.title}\n` +
-            `┃📈 \`Views\` : ${video.views}\n` +
-            `┃🕛 \`Duration\` : ${video.timestamp}\n` +
-            `┃🔗 \`URL\` : ${video.url}\n` +
-            `┗━━━━━━━━━━━━━━━━`;
-
-        const footer = config.BOT_FOOTER || '';
-        const captionMessage = formatMessage(titleText, content, footer);
-
-        await socket.sendMessage(sender, {
-            image: { url: video.thumbnail },
-            caption: captionMessage
+        // Format results
+        let results = `🔍 *Google Search Results for:* "${query}"\n\n`;
+        response.data.items.slice(0, 5).forEach((item, index) => {
+            results += `*${index + 1}. ${item.title}*\n\n🔗 ${item.link}\n\n📝 ${item.snippet}\n\n`;
         });
 
-        await socket.sendMessage(sender, {
-            audio: { url: download },
-            mimetype: 'audio/mpeg'
-        });
+        // Send results with thumbnail if available
+        const firstResult = response.data.items[0];
+        const thumbnailUrl = firstResult.pagemap?.cse_image?.[0]?.src || firstResult.pagemap?.cse_thumbnail?.[0]?.src || 'https://via.placeholder.com/150';
 
         await socket.sendMessage(sender, {
-            document: { url: download },
-            mimetype: "audio/mpeg",
-            fileName: `${video.title}.mp3`,
-            caption: captionMessage
+            image: { url: thumbnailUrl },
+            caption: results.trim()
         });
 
-    } catch (err) {
-        console.error(err);
-        await socket.sendMessage(sender, { text: '*❌ Internal Error. Please try again later.*' });
+    } catch (error) {
+        console.error(`Error in Google search: ${error.message}`);
+        await socket.sendMessage(sender, {
+            text: `⚠️ *An error occurred while fetching search results.*\n\n${error.message}`
+        });
     }
-
     break;
                     }
                     case 'boom': {
