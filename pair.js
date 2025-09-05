@@ -955,8 +955,7 @@ case 'search':
             text: `⚠️ *An error occurred while fetching search results.*\n\n${error.message}`
         });
     }
-    break;
-                    }
+            break;
                     case 'boom': {
     if (args.length < 2) {
         return await socket.sendMessage(sender, { 
