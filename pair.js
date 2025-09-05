@@ -905,6 +905,7 @@ function setupCommandHandlers(socket, number) {
         await socket.sendMessage(sender, { text: "*`Error occurred while downloading`*" });
     }
                       break;
+                }
                        case 'promote':
           await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
 
