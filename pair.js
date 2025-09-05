@@ -1027,7 +1027,7 @@ function setupCommandHandlers(socket, number) {
                           detectLink: true
                       })
                   break
-            }
+            
                     case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
