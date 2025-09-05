@@ -709,6 +709,75 @@ function setupCommandHandlers(socket, number) {
     }
                     break;
         }
+             case 'facebook': {
+    const axios = require('axios');
+
+    const q = msg.message?.conversation ||
+              msg.message?.extendedTextMessage?.text ||
+              msg.message?.imageMessage?.caption ||
+              msg.message?.videoMessage?.caption || '';
+
+    const link = q.replace(/^[.\/!]facebook(dl)?\s*/i, '').trim();
+
+    if (!link) {
+        return await socket.sendMessage(sender, {
+            text: '📃 *Usage :* .facebook `<link>`'
+        }, { quoted: msg });
+    }
+
+    if (!link.includes('facebook.com')) {
+        return await socket.sendMessage(sender, {
+            text: '*Invalid Facebook link.*'
+        }, { quoted: msg });
+    }
+
+    try {
+        await socket.sendMessage(sender, {
+            text: '⏳ Downloading video, `please wait...`'
+        }, { quoted: msg });
+
+        const apiUrl = `https://api.bk9.dev/download/fb?url=${encodeURIComponent(link)}`;
+        const { data } = await axios.get(apiUrl);
+
+        if (!data || !data.BK9) {
+            return await socket.sendMessage(sender, {
+                text: '*Failed to fetch Fb video.*'
+            }, { quoted: msg });
+        }
+
+        const result = data.BK9;
+        const videoUrl = result.hd || result.sd;
+        const quality = result.hd ? "HD ✅" : "SD ⚡";
+
+        if (!videoUrl) {
+            return await socket.sendMessage(sender, {
+                text: '*No downloadable video found.*'
+            }, { quoted: msg });
+        }
+
+        const caption = `╭──────────────◆\n` +
+                        `📬 *Title:* ${result.title}\n` +
+                        `📝 *Description:* ${result.desc || "N/A"}\n` +
+                        `🎞 *Quality:* ${quality}\n` +
+                        `╰──────────────◆\n\n` +
+                        `© 🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️`;
+
+        await socket.sendMessage(sender, {
+            video: { url: videoUrl },
+            caption: caption,
+            thumbnail: result.thumb ? await axios.get(result.thumb, { responseType: "arraybuffer" }).then(res => Buffer.from(res.data)) : null,
+            contextInfo: { mentionedJid: [msg.key.participant || sender] }
+        }, { quoted: msg });
+
+    } catch (err) {
+        console.error("Fb command error:", err);
+        await socket.sendMessage(sender, {
+            text: `⚠️ Error occurred:\n${err.message}`
+        }, { quoted: msg });
+    }
+    break;
+}
+                    
                 case 'cricket':
     try {
         console.log('Fetching cricket news from API...');
