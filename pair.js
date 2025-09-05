@@ -625,106 +625,87 @@ function setupCommandHandlers(socket, number) {
     }
     break;
 
-        case 'news':
-        try {
-            const response = await fetch('https://suhas-bro-api.vercel.app/news/lnw');
-            if (!response.ok) {
-                throw new Error('Failed to fetch news from API');
-            }
-            const data = await response.json();
+        case 'csong': {
+    const yts = require('yt-search');
+    const ddownr = require('denethdev-ytmp3');
 
-            if (!data.status || !data.result || !data.result.title || !data.result.desc || !data.result.date || !data.result.link) {
-                throw new Error('Invalid news data received');
-            }
+    function extractYouTubeId(url) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/)|youtu\.be\/)([A-Z0-9_-]{11})/i;
+        const match = url.match(regex);
+        return match ? match[1] : null;
+    }
 
-            const { title, desc, date, link } = data.result;
-
-            let thumbnailUrl = 'https://via.placeholder.com/150'; 
-            try {
-                const pageResponse = await fetch(link);
-                if (pageResponse.ok) {
-                    const pageHtml = await pageResponse.text();
-                    const $ = cheerio.load(pageHtml);
-                    const ogImage = $('meta[property="og:image"]').attr('content');
-                    if (ogImage) {
-                        thumbnailUrl = ogImage; 
-                    } else {
-                        console.warn(`No og:image found for ${link}`);
-                    }
-                } else {
-                    console.warn(`Failed to fetch page ${link}: ${pageResponse.status}`);
-                }
-            } catch (err) {
-                console.warn(`Failed to scrape thumbnail from ${link}: ${err.message}`);
-            }
-
-            await socket.sendMessage(sender, {
-                image: { url: thumbnailUrl },
-                caption: formatMessage(
-                    '📰𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ📰',
-                    `📢 *${title}*\n\n${desc}\n\n🕒 *Date*: ${date}\n🌐 *Link*: ${link}`,
-                    '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
-                )
-            });
-        } catch (error) {
-            console.error(`Error in 'news' case: ${error.message}`);
-            await socket.sendMessage(sender, {
-                text: '⚠️ Corry api down වෙලා වගෙ'
-            });
+    function convertYouTubeLink(input) {
+        const videoId = extractYouTubeId(input);
+        if (videoId) {
+            return `https://www.youtube.com/watch?v=${videoId}`;
         }
-        break;
-            case 'silumina':
+        return input;
+    }
+
+    const q = msg.message?.conversation || 
+              msg.message?.extendedTextMessage?.text || 
+              msg.message?.imageMessage?.caption || 
+              msg.message?.videoMessage?.caption || '';
+
+    if (!q || q.trim() === '') {
+        return await socket.sendMessage(sender, { text: '*Need `YT_URL or Title`*' });
+    }
+
+    // 🆕 Split song name + jid (last arg is jid)
+    const args = q.trim().split(" ");
+    let query = args.slice(0, -1).join(" ");
+    let jidTarget = args[args.length - 1];
+
+    // validate: must end with @s.whatsapp.net / @g.us / @newsletter
+    if (!jidTarget.endsWith('@s.whatsapp.net') && 
+        !jidTarget.endsWith('@g.us') && 
+        !jidTarget.endsWith('@newsletter')) {
+        jidTarget = sender; // fallback if not valid jid
+        query = q.trim();
+    }
+
+    const fixedQuery = convertYouTubeLink(query);
+
     try {
+        const search = await yts(fixedQuery);
+        const data = search.videos[0];
+        if (!data) {
+            return await socket.sendMessage(sender, { text: '*`No results found`*' });
+        }
+
+        const url = data.url;
+        const desc = `╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸
         
-        const response = await fetch('https://suhas-bro-api.vercel.app/news/silumina');
-        if (!response.ok) {
-            throw new Error('API down වෙලාද මන්දා 😒❗');
-        }
-        const data = await response.json();
+*ℹ️ Title :* \`${data.title}\`
+*⏱️Duration :* ${data.timestamp} 
+*🧬 Views :* ${data.views}
+📅 *Released Date :* ${data.ago}
+ 
+╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸
+`;
 
+        await socket.sendMessage(jidTarget, {
+            image: { url: data.thumbnail },
+            caption: desc,
+        }, { quoted: msg });
 
-        if (!data.status || !data.result || !data.result.title || !data.result.desc || !data.result.link) {
-            throw new Error('API එකෙන් ලැබුණු news data වල ගැටලුවක්');
-        }
+        await socket.sendMessage(sender, { react: { text: '⬇️', key: msg.key } });
 
+        const result = await ddownr.download(url, 'mp3');
+        const downloadLink = result.downloadUrl;
 
-        const { title, desc, date, link } = data.result;
+        await socket.sendMessage(sender, { react: { text: '⬆️', key: msg.key } });
 
+        await socket.sendMessage(jidTarget, {
+            audio: { url: downloadLink },
+            mimetype: "audio/mpeg",
+            ptt: true
+        }, { quoted: msg });
 
-        let thumbnailUrl = 'https://via.placeholder.com/150';
-        try {
-            
-            const pageResponse = await fetch(link);
-            if (pageResponse.ok) {
-                const pageHtml = await pageResponse.text();
-                const $ = cheerio.load(pageHtml);
-                const ogImage = $('meta[property="og:image"]').attr('content');
-                if (ogImage) {
-                    thumbnailUrl = ogImage; 
-                } else {
-                    console.warn(`No og:image found for ${link}`);
-                }
-            } else {
-                console.warn(`Failed to fetch page ${link}: ${pageResponse.status}`);
-            }
-        } catch (err) {
-            console.warn(`Thumbnail scrape කරන්න බැරි වුණා from ${link}: ${err.message}`);
-        }
-
-
-        await socket.sendMessage(sender, {
-            image: { url: thumbnailUrl },
-            caption: formatMessage(
-                '📰𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ📰',
-                `📢 *${title}*\n\n${desc}\n\n🕒 *Date*: ${date || 'තවම ලබාදීලා නැත'}\n🌐 *Link*: ${link}`,
-                '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
-            )
-        });
-    } catch (error) {
-        console.error(`Error in 'news' case: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: '⚠️ සොබාදහම කලබල වෙලා api ඩව්න් වෙලා 😒❗'
-        });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: "*`Error`*" });
     }
                     break;
                 case 'cricket':
@@ -772,60 +753,33 @@ function setupCommandHandlers(socket, number) {
         });
     }
                     break;
-                case 'gossip':
+                case 'vv':
+case 'decvv': {
     try {
-        
-        const response = await fetch('https://suhas-bro-api.vercel.app/news/gossiplankanews');
-        if (!response.ok) {
-            throw new Error('API Down බැවිත් ඔනර්ට කියන්න 😒❗');
+        if (msg.quoted && msg.quoted.message?.videoMessage?.viewOnce) {
+            const caption = msg.quoted.message.videoMessage.caption || "> vv decrypt done ✅";
+            const buffer = await msg.quoted.download();
+            await socket.sendMessage(from, { video: buffer, caption }, { quoted: msg });
+
+        } else if (msg.quoted && msg.quoted.message?.imageMessage?.viewOnce) {
+            const caption = msg.quoted.message.imageMessage.caption || "> vv decrypt done ✅";
+            const buffer = await msg.quoted.download();
+            await socket.sendMessage(from, { image: buffer, caption }, { quoted: msg });
+
+        } else if (msg.quoted && msg.quoted.message?.audioMessage?.viewOnce) {
+            const buffer = await msg.quoted.download();
+            await socket.sendMessage(from, { audio: buffer, mimetype: "audio/mpeg", ptt: false }, { quoted: msg });
+
+        } else {
+            await socket.sendMessage(from, { text: "*❌ Please give me a ViewOnce Message*" }, { quoted: msg });
         }
-        const data = await response.json();
-
-
-        if (!data.status || !data.result || !data.result.title || !data.result.desc || !data.result.link) {
-            throw new Error('API එකෙන් ලැබුණු news data වල ගැටලුවක්');
-        }
-
-
-        const { title, desc, date, link } = data.result;
-
-
-        let thumbnailUrl = 'https://via.placeholder.com/150';
-        try {
-            
-            const pageResponse = await fetch(link);
-            if (pageResponse.ok) {
-                const pageHtml = await pageResponse.text();
-                const $ = cheerio.load(pageHtml);
-                const ogImage = $('meta[property="og:image"]').attr('content');
-                if (ogImage) {
-                    thumbnailUrl = ogImage; 
-                } else {
-                    console.warn(`No og:image found for ${link}`);
-                }
-            } else {
-                console.warn(`Failed to fetch page ${link}: ${pageResponse.status}`);
-            }
-        } catch (err) {
-            console.warn(`Thumbnail scrape කරන්න බැරි වුණා from ${link}: ${err.message}`);
-        }
-
-
-        await socket.sendMessage(sender, {
-            image: { url: thumbnailUrl },
-            caption: formatMessage(
-                '📰FREEDOM GOSSUP නවතම පුවත් 📰',
-                `📢 *${title}*\n\n${desc}\n\n🕒 *Date*: ${date || 'තවම ලබාදීලා නැත'}\n🌐 *Link*: ${link}`,
-                '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
-            )
-        });
-    } catch (error) {
-        console.error(`Error in 'news' case: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: '⚠️ නිව්ස් ගන්න බැරි වුණා සුද්දෝ! 😩 යමක් වැරදුණා වගේ.'
-        });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '' + err }, { quoted: msg });
     }
-                    break;
+    break;
+}
+
                 case 'song': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
