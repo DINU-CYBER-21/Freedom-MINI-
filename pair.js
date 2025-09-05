@@ -906,115 +906,71 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
-                    case 'vv':
-    console.log('vv command triggered for:', number);
-    if (!msg.message.extendedTextMessage?.contextInfo?.quotedMessage) {
-        await socket.sendMessage(sender, {
-            image: { url: config.RCD_IMAGE_PATH },
-            caption: formatMessage(
-                '❌ ERROR',
-                '*🍁 Please reply to a ViewOnce message!*',
-                `${config.FOOTER}`
-            )
-        });
-        break;
-    }
+                    case 'vv': 
+case 'viewonce':
+case 'retrive': {
     try {
-        const quotedMessage = msg.message.extendedTextMessage.contextInfo.quotedMessage;
-        const mtype = Object.keys(quotedMessage)[0];
-        if (
-            (mtype === 'imageMessage' && quotedMessage.imageMessage?.viewOnce) ||
-            (mtype === 'videoMessage' && quotedMessage.videoMessage?.viewOnce) ||
-            (mtype === 'audioMessage' && quotedMessage.audioMessage?.viewOnce)
-        ) {
-            const decryptingMessage = {
-                image: { url: config.RCD_IMAGE_PATH },
-                caption: formatMessage(
-                    '🔓 DECRYPTING',
-                    'Decrypting the ViewOnce Message...',
-                    `${config.FOOTER}`
-                )
-            };
-            const sentMessage = await socket.sendMessage(sender, decryptingMessage, { quoted: msg });
-            const stream = await downloadContentFromMessage(quotedMessage[mtype], mtype.replace('Message', '')); 
-            const chunks = [];
-            for await (const chunk of stream) {
-                chunks.push(chunk);
-            }
-            const buffer = Buffer.concat(chunks);
-
-            let messageContent = {};
-            let caption = '';
-            switch (mtype) {
-                case 'imageMessage':
-                    caption = quotedMessage.imageMessage?.caption || `${config.FOOTER}`;
-                    messageContent = {
-                        image: buffer,
-                        caption: caption,
-                        mimetype: quotedMessage.imageMessage?.mimetype || 'image/jpeg'
-                    };
-                    break;
-                case 'videoMessage':
-                    caption = quotedMessage.videoMessage?.caption || `${config.FOOTER}`;
-                    messageContent = {
-                        video: buffer,
-                        caption: caption,
-                        mimetype: quotedMessage.videoMessage?.mimetype || 'video/mp4'
-                    };
-                    break;
-                case 'audioMessage':
-                    caption = quotedMessage.audioMessage?.caption || `${config.FOOTER}`;
-                    messageContent = {
-                        audio: buffer,
-                        caption: caption,
-                        mimetype: quotedMessage.audioMessage?.mimetype || 'audio/mp4',
-                        ptt: quotedMessage.audioMessage?.ptt || false
-                    };
-                    break;
-                default:
-                    await socket.sendMessage(sender, {
-                        image: { url: config.RCD_IMAGE_PATH },
-                        caption: formatMessage(
-                            '❌ ERROR',
-                            'Only ViewOnce image, video, and audio messages are supported',
-                            `${config.FOOTER}`
-                        )
-                    });
-                    await socket.sendMessage(sender, { delete: sentMessage.key });
-                    return;
-            }
-            await socket.sendMessage(sender, messageContent, { quoted: msg });
-            await socket.sendMessage(sender, { delete: sentMessage.key });
+        if (!isCreator) {
             await socket.sendMessage(sender, {
-                image: { url: config.RCD_IMAGE_PATH },
-                caption: formatMessage(
-                    '✅ SUCCESS',
-                    'ViewOnce message decrypted and sent successfully!',
-                    `${config.FOOTER}`
-                )
-            });
-        } else {
-            await socket.sendMessage(sender, {
-                image: { url: config.RCD_IMAGE_PATH },
-                caption: formatMessage(
-                    '❌ ERROR',
-                    '*🍁 Please reply to a ViewOnce message!*',
-                    `${config.FOOTER}`
-                )
-            });
+                text: "*📛 This is an owner command.*"
+            }, { quoted: m });
+            break;
         }
+
+        if (!m.quoted) {
+            await socket.sendMessage(sender, {
+                text: "*🍁 Please reply to a view once message!*"
+            }, { quoted: m });
+            break;
+        }
+
+        const buffer = await m.quoted.download();
+        const mtype = m.quoted.mtype;
+        const options = { quoted: m };
+
+        let messageContent = {};
+        switch (mtype) {
+            case "imageMessage":
+                messageContent = {
+                    image: buffer,
+                    caption: m.quoted.text || '',
+                    mimetype: m.quoted.mimetype || "image/jpeg"
+                };
+                break;
+            case "videoMessage":
+                messageContent = {
+                    video: buffer,
+                    caption: m.quoted.text || '',
+                    mimetype: m.quoted.mimetype || "video/mp4"
+                };
+                break;
+            case "audioMessage":
+                messageContent = {
+                    audio: buffer,
+                    mimetype: "audio/mp4",
+                    ptt: m.quoted.ptt || false
+                };
+                break;
+            default:
+                await socket.sendMessage(sender, {
+                    text: "❌ Only image, video, and audio messages are supported"
+                }, { quoted: m });
+                break;
+        }
+
+        if (Object.keys(messageContent).length > 0) {
+            await socket.sendMessage(sender, messageContent, options);
+        }
+
     } catch (error) {
-        console.error('VV Command Error:', error);
+        console.error("vv Error:", error);
         await socket.sendMessage(sender, {
-            image: { url: config.RCD_IMAGE_PATH },
-            caption: formatMessage(
-                '❌ ERROR',
-                `Error decrypting ViewOnce message: ${error.message}`,
-                `${config.FOOTER}`
-            )
-        });
+            text: "❌ Error fetching vv message:\n" + error.message
+        }, { quoted: m });
     }
-       break;
+
+    break;
+}
                     case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
