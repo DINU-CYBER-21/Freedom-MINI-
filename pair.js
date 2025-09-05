@@ -778,7 +778,7 @@ function setupCommandHandlers(socket, number) {
     break;
 }
                 case 'owner': {
-    const ownerNumber = '94770690281'.'94740021158';
+    const ownerNumber = '94770690281';
     const ownerName = '𝐃𝐈𝐍𝐔×𝐒𝐇𝐀𝐆𝐈';
     const organization = '*𝐒𝐔𝐋𝐀-𝐌𝐃* WHATSAPP BOT DEVALOPER 🍬';
 
@@ -967,28 +967,6 @@ function setupCommandHandlers(socket, number) {
                       break;
                 }
                        
-    
-// ------------------ iNewsTV Scraper Function ------------------
-case "owner":
-        {
-          await dragon.sendMessage(from, { react: { text: `👤`, key: m.key } });
-          const vcard =
-            "BEGIN:VCARD\n" +
-            "VERSION:3.0\n" +
-            "FN:Sandaru \n" +
-            "ORG:Owner;\n" +
-            "TEL;type=CELL;type=VOICE;waid=94770690281:94740021158\n" +
-            "END:VCARD";
-
-          
-
-          await dragon.sendMessage(
-            from,
-            { contacts: { displayName: "Gay", contacts: [{ vcard }] } },
-            { quoted: fkontak }
-          );
-        }
-        break;
                   case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
