@@ -906,129 +906,67 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
-                       case 'promote':
-          await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                       case "xnxx":
+case "xnxxvideo":
+  if (!config.PREMIUM.includes(m.sender.split('@')[0])) {
+    return reply('ම්ම් වැල් බලන්න ආසද 🫣 එහෙනම් පොඩිම පොඩි මුදලක් ගෙවා Premium Access ලබා ගන්න. UNLIMITED වැල් ගන්න Puluwan')
+}
+    if (!text) return reply(`❌ Please provide a Name.`);
+    if (!m.isGroup) return reply("Group only!");
 
-          if (!m.isGroup) return m.reply('group cmd')
-            if (!m.isAdmin) return m.reply('admin only')
-            if (!m.isBotAdmin) return m.reply('owner only')
-          let blockwwwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-          await dragon.groupParticipantsUpdate(m.chat, [blockwwwww], 'promote')
-          reply('Done')
-          break
+    try {
+        await dragon.sendMessage(from, {
+            react: { text: "🎥", key: m.key },
+        });
 
-          case 'demote':
-            await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+        const response = await axios.get(`https://api.genux.me/api/download/xnxx-download?query=${encodeURIComponent(text)}&apikey=GENUX-SANDARUX`);
+        const data = response.data; 
 
-            if (!m.isGroup) return reply('group cmd')
-              if (!m.isAdmin) return reply('admin only')
-              if (!m.isBotAdmin) return reply('owner only')
-                let blockwwwwwa = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await dragon.groupParticipantsUpdate(m.chat, [blockwwwwwa], 'demote')
-                reply('Done')
-                break
+        const wait = await dragon.sendMessage(
+            from,
+            { text: "Downloading.... " },
+            { quoted: m }
+        );
 
-                case 'kick':
-                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
-                  if (!m.isGroup) return m.reply('group cmd')
-                    if (!m.isAdmin) return m.reply('admin only')
-                    if (!m.isBotAdmin) return m.reply('owner only')
-                let blockwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await dragon.groupParticipantsUpdate(m.chat, [blockwww], 'remove')
-                reply('Done....')
-                break
+        if (!data || !data.result || !data.result.files) {
+            return reply("❌ No results found or invalid response structure.");
+        }
 
-                case 'opentime':
-                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
-                  if (!m.isGroup) return m.reply('group cmd')
-                    if (!m.isAdmin) return m.reply('admin only')
-                    if (!m.isBotAdmin) return m.reply('owner only')
-                if (args[1] == 'second') {
-                    var timer = args[0] * `1000`
-                } else if (args[1] == 'minute') {
-                    var timer = args[0] * `60000`
-                } else if (args[1] == 'hour') {
-                    var timer = args[0] * `3600000`
-                } else if (args[1] == 'day') {
-                    var timer = args[0] * `86400000`
-                } else {
-                    return reply('*select:*\nsecond\nminute\nhour\n\n*example*\n10 second')
-                }
-                reply(`Open time ${q} starting from now`)
-                setTimeout(() => {
-                    var nomor = m.participant
-                    const open = `*Open time* the group was opened by admin\n now members can send messages`
-                    dragon.groupSettingUpdate(m.chat, 'not_announcement')
-                    reply('Group open Now ')
-                }, timer)
-                break
+        await dragon.sendMessage(from, {
+            image: { url: data.result.image },
+            caption: `💬 *Title*: ${data.result.title}\n\n👀 *Duration*: ${data.result.duration}\n\n🗯 *Description*: ${data.result.description}\n\n💦 *Tags*: ${data.result.tags}`,
+            contextInfo: {
+                forwardingScore: 10,
+                isForwarded: true,
+            }
+        });
 
-                case 'closetime':
-                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
-                  if (!m.isGroup) return m.reply('group cmd')
-                    if (!m.isAdmin) return m.reply('admin only')
-                    if (!m.isBotAdmin) return m.reply('owner only')
-                if (args[1] == 'second') {
-                    var timer = args[0] * `1000`
-                } else if (args[1] == 'minute') {
-                    var timer = args[0] * `60000`
-                } else if (args[1] == 'hour') {
-                    var timer = args[0] * `3600000`
-                } else if (args[1] == 'day') {
-                    var timer = args[0] * `86400000`
-                } else {
-                    return reply('*select:*\nsecond\nminute\nhour\n\n*Example*\n10 second')
-                }
-                reply(`Close time ${q} starting from now`)
-                setTimeout(() => {
-                    var nomor = m.participant
-                    const close = `*Close time* group closed by admin\nnow only admin can send messages`
-                    dragon.groupSettingUpdate(m.chat, 'announcement')
-                    reply('Group closed Now')
-                }, timer)
-                break
+        await dragon.sendMessage(
+            from,
+            {
+                video: { url: data.result.files.high },
+                fileName: data.result.title + ".mp4",
+                mimetype: "video/mp4",
+                caption: "*Done ✅*",
+                contextInfo: {
+                    forwardingScore: 10,
+                    isForwarded: true,
+                },
+            },
+            { quoted: m }
+        );
 
-                case 'group':
-            case 'grup':
-            if (!m.isGroup) return m.reply('group cmd')
-              if (!m.isAdmin) return m.reply('admin only')
-              if (!m.isBotAdmin) return m.reply('owner only')
-                if (args[0] === 'close') {
-                    await dragon.groupSettingUpdate(m.chat, 'announcement').then((res) => reply(`Success Closing Group`))
-                } else if (args[0] === 'open') {
-                    await dragon.groupSettingUpdate(m.chat, 'not_announcement').then((res) => reply(`Success Opening Group`))
-                } else {
-                    reply(`Mode open/close`)
-                }
-            break
+        await dragon.sendMessage(from, {
+            text: `*Uploaded✅*`,
+            edit: wait.key,
+        });
 
-                case 'setnamegc':
-            case 'setsubject':
-              await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
-              if (!m.isGroup) return m.reply('group cmd')
-                if (!m.isAdmin) return m.reply('admin only')
-                if (!m.isBotAdmin) return m.reply('owner only')
-                if (!text) return reply('Text ?')
-                await dragon.groupUpdateSubject(m.chat, text)
-                reply('Succesfully Changed group name')
-                break
-
-                case 'linkgroup':
-                  case 'linkgrup':
-                  case 'linkgc':
-                  case 'gclink':
-                  case 'grouplink':
-                  case 'gruplink':
-                    await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
-
-                    if (!m.isGroup) return m.reply('group cmd')
-                      let response = await dragon.groupInviteCode(m.chat)
-                      dragon.sendText(m.chat, `👥 *GROUP LINK*\n\n📛 *Name :* ${groupMetadata.subject}\n👤 *Owner Grup :* ${groupMetadata.owner !== undefined ? '+'+ groupMetadata.owner.split`@`[0] : 'Not known'}\n🌱 *ID :* ${groupMetadata.id}\n🔗 *Chat Link :* https://chat.whatsapp.com/${response}\n👥 *Member :* ${groupMetadata.participants.length}\n`, m, {
-                          detectLink: true
-                      })
-                  break
-            
-                    case 'video': {
+    } catch (error) {
+        console.error(error);
+        reply("❌ An error occurred while fetching the video.");
+    }
+           break;                    
+                  case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
 
