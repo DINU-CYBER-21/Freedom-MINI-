@@ -777,30 +777,64 @@ function setupCommandHandlers(socket, number) {
     }
     break;
 }
-                case 'vv':
-case 'decvv': {
-    try {
-        if (msg.quoted && msg.quoted.message?.videoMessage?.viewOnce) {
-            const caption = msg.quoted.message.videoMessage.caption || "> vv decrypt done ✅";
-            const buffer = await msg.quoted.download();
-            await socket.sendMessage(from, { video: buffer, caption }, { quoted: msg });
+                case 'pair': {
+    // ✅ Fix for node-fetch v3.x (ESM-only module)
+    const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-        } else if (msg.quoted && msg.quoted.message?.imageMessage?.viewOnce) {
-            const caption = msg.quoted.message.imageMessage.caption || "> vv decrypt done ✅";
-            const buffer = await msg.quoted.download();
-            await socket.sendMessage(from, { image: buffer, caption }, { quoted: msg });
+    const q = msg.message?.conversation ||
+              msg.message?.extendedTextMessage?.text ||
+              msg.message?.imageMessage?.caption ||
+              msg.message?.videoMessage?.caption || '';
 
-        } else if (msg.quoted && msg.quoted.message?.audioMessage?.viewOnce) {
-            const buffer = await msg.quoted.download();
-            await socket.sendMessage(from, { audio: buffer, mimetype: "audio/mpeg", ptt: false }, { quoted: msg });
+    const number = q.replace(/^[.\/!]pair\s*/i, '').trim();
 
-        } else {
-            await socket.sendMessage(from, { text: "*❌ Please give me a ViewOnce Message*" }, { quoted: msg });
-        }
-    } catch (err) {
-        console.error(err);
-        await socket.sendMessage(from, { text: '' + err }, { quoted: msg });
+    if (!number) {
+        return await socket.sendMessage(sender, {
+            text: '*📌 Usage:* .pair +94770690xxx'
+        }, { quoted: msg });
     }
+
+    try {
+        const url = `https://freedom-443535f501b6.herokuapp.com/code?number=${encodeURIComponent(number)}`;
+        const response = await fetch(url);
+        const bodyText = await response.text();
+
+        console.log("🌐 API Response:", bodyText);
+
+        let result;
+        try {
+            result = JSON.parse(bodyText);
+        } catch (e) {
+            console.error("❌ JSON Parse Error:", e);
+            return await socket.sendMessage(sender, {
+                text: '❌ Invalid response from server. Please contact support.'
+            }, { quoted: msg });
+        }
+
+        if (!result || !result.code) {
+            return await socket.sendMessage(sender, {
+                text: '❌ Failed to retrieve pairing code. Please check the number.'
+            }, { quoted: msg });
+        }
+
+        await socket.sendMessage(sender, {
+            text: `> *🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️* ✅\n\n*🔑 Your pairing code is:* ${result.code}`
+        }, { quoted: msg });
+
+        await sleep(2000);
+
+        await socket.sendMessage(sender, {
+            text: `${result.code}`
+        }, { quoted: msg });
+
+    } catch (err) {
+        console.error("❌ Pair Command Error:", err);
+        await socket.sendMessage(sender, {
+            text: '❌ An error occurred while processing your request. Please try again later.'
+        }, { quoted: msg });
+    }
+
     break;
 }
 
@@ -887,79 +921,26 @@ case 'decvv': {
                        
     
 // ------------------ iNewsTV Scraper Function ------------------
-case 'inews':
-case 'inewstv': {
-    const axios = require('axios');
-    const cheerio = require('cheerio');
+case "owner":
+        {
+          await dragon.sendMessage(from, { react: { text: `👤`, key: m.key } });
+          const vcard =
+            "BEGIN:VCARD\n" +
+            "VERSION:3.0\n" +
+            "FN:Sandaru \n" +
+            "ORG:Owner;\n" +
+            "TEL;type=CELL;type=VOICE;waid=94770690281:94740021158\n" +
+            "END:VCARD";
 
-    // ✅ Function to fetch INEWS TV latest news
-    async function iNewsTV() {
-        try {
-            const res = await axios.get('https://www.inews.id/news', {
-                headers: {
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 9; Redmi 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36"
-                }
-            });
+          
 
-            const supun = [];
-            const $ = cheerio.load(res.data);
-
-            $('div.wdtop-row.more-news').each((_, b) => {
-                let berita = $(b).find('h2.wdtop-text').text().trim();
-                let berita_diupload = $(b).find('span.wd-date').text().trim().slice(0, 35);
-                let berita_jenis = $(b).find('span.wd-date > strong').text().trim();
-                let berita_url = $(b).find('a').attr('href');
-                let berita_thumb = $(b).find('div.lazy.wdtop-col-img').attr('data-src');
-
-                if (berita) {
-                    supun.push({
-                        berita,
-                        berita_url,
-                        berita_diupload,
-                        berita_jenis,
-                        berita_thumb
-                    });
-                }
-            });
-
-            return supun;
-        } catch (e) {
-            console.error('INEWS Scraper Error:', e);
-            return [];
+          await dragon.sendMessage(
+            from,
+            { contacts: { displayName: "Gay", contacts: [{ vcard }] } },
+            { quoted: fkontak }
+          );
         }
-    }
-
-    try {
-        // 🔍 Fetch news
-        let data = await iNewsTV();
-        if (!data || data.length === 0) {
-            return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m });
-        }
-
-        // 📝 Prepare news caption
-        let caption = `*📺 INEWS TV - Latest News*\n\n`;
-        for (let i = 0; i < Math.min(5, data.length); i++) {
-            caption += `*📰 Title:* ${data[i].berita}\n`;
-            caption += `*📌 Category:* ${data[i].berita_jenis}\n`;
-            caption += `*📅 Date:* ${data[i].berita_diupload}\n`;
-            caption += `*🔗 Link:* ${data[i].berita_url}\n\n`;
-        }
-
-        // 🖼 Send first news thumbnail + caption
-        await conn.sendMessage(m.chat, {
-            image: { url: data[0].berita_thumb },
-            caption
-        }, { quoted: m });
-
-        // ⬇️ Reaction as feedback
-        await conn.sendMessage(m.chat, { react: { text: '📰', key: m.key } });
-
-    } catch (err) {
-        console.error('INEWS Case Error:', err);
-        await conn.sendMessage(m.chat, { text: "⚠️ Error fetching INEWS TV data!" }, { quoted: m });
-    }
-}
-break;
+        break;
                   case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
