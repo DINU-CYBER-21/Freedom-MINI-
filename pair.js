@@ -778,7 +778,7 @@ function setupCommandHandlers(socket, number) {
     break;
 }
                 case 'owner': {
-    const ownerNumber = '+94770690281'.'+94740021158';
+    const ownerNumber = '94770690281'.'94740021158';
     const ownerName = '𝐃𝐈𝐍𝐔×𝐒𝐇𝐀𝐆𝐈';
     const organization = '*𝐒𝐔𝐋𝐀-𝐌𝐃* WHATSAPP BOT DEVALOPER 🍬';
 
