@@ -906,6 +906,69 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
+                    case 'song2': {
+    try {
+        const q = text.split(" ").slice(1).join(" ").trim();
+        if (!q) {
+            await socket.sendMessage(sender, { text: '*🚫 Please enter a song name to search.*' });
+            return;
+        }
+
+        const searchResults = await yts(q);
+        if (!searchResults.videos.length) {
+            await socket.sendMessage(sender, { text: '*🚩 Result Not Found*' });    
+            return;
+        }
+
+        const video = searchResults.videos[0];
+
+        // ==== API CALL ====
+        const apiUrl = `${api}/download/ytmp3?url=${encodeURIComponent(video.url)}&apikey=${apikey}`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (!data.status || !data.data?.result) {
+            await socket.sendMessage(sender, { text: '*🚩 Download Error. Please try again later.*' });
+            return;
+        }
+
+        const { title, uploader, duration, quality, format, thumbnail, download } = data.data.result;
+
+        const titleText = '*FREEDOM SONG DL*';
+        const content = `┏━━━━━━━━━━━━━━━━\n` +
+            `┃📝 \`Title\` : ${video.title}\n` +
+            `┃📈 \`Views\` : ${video.views}\n` +
+            `┃🕛 \`Duration\` : ${video.timestamp}\n` +
+            `┃🔗 \`URL\` : ${video.url}\n` +
+            `┗━━━━━━━━━━━━━━━━`;
+
+        const footer = config.BOT_FOOTER || '';
+        const captionMessage = formatMessage(titleText, content, footer);
+
+        await socket.sendMessage(sender, {
+            image: { url: video.thumbnail },
+            caption: captionMessage
+        });
+
+        await socket.sendMessage(sender, {
+            audio: { url: download },
+            mimetype: 'audio/mpeg'
+        });
+
+        await socket.sendMessage(sender, {
+            document: { url: download },
+            mimetype: "audio/mpeg",
+            fileName: `${video.title}.mp3`,
+            caption: captionMessage
+        });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: '*❌ Internal Error. Please try again later.*' });
+    }
+
+    break;
+                    }
                     case 'boom': {
     if (args.length < 2) {
         return await socket.sendMessage(sender, { 
