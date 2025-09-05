@@ -906,65 +906,26 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
-                    case 'dood': {
-    try {
-        if (!m.quoted || !m.quoted.videoMessage) {
-            await socket.sendMessage(sender, { 
-                text: "📎 *Reply a video to upload on DoodStream!*" 
-            }, { quoted: m });
-            break;
-        }
-
-        const doodUpload = async (filePath, apikey = process.env.DOODSTREAM_API_KEY || "bagus") => {
-            const axios = require("axios");
-            const FormData = require("form-data");
-            const fs = require("fs");
-
-            const form = new FormData();
-            form.append("file", fs.createReadStream(filePath));
-
-            const url = `https://doodstream-api.zone.id/api/doodupload?apikey=${apikey}`;
-            const res = await axios.post(url, form, { headers: form.getHeaders() });
-            
-            if (!res.data.success || !res.data.filename || !res.data.download_url) {
-                throw new Error("Invalid API response");
-            }
-            return res.data;
-        };
-
-        const fs = require("fs");
-        const filePath = `./temp_dood_${Date.now()}.mp4`;
-        const buffer = await m.quoted.download();
-        
-        try {
-            fs.writeFileSync(filePath, buffer);
-        } catch (err) {
-            throw new Error("Failed to save temporary file: " + err.message);
-        }
-
-        const result = await doodUpload(filePath);
-
-        const { filename, uploaded_at, download_url, view_url } = result;
-        const caption = `*✅ Uploaded to DoodStream*\n\n` +
-                       `📂 File: ${filename}\n` +
-                       `🕛 Uploaded: ${uploaded_at}\n` +
-                       `⬇ Download: ${download_url}\n` +
-                       `👁 View: ${view_url}`;
-
-        await socket.sendMessage(sender, { text: caption }, { quoted: m });
-
-        try {
-            fs.unlinkSync(filePath);
-        } catch (err) {
-            console.error("Failed to delete temp file:", err);
-        }
-
-    } catch (err) {
-        console.error("dood Error:", err);
-        await socket.sendMessage(sender, { 
-            text: "❌ Internal Error: " + err.message 
-        }, { quoted: m });
+                    case 'boom': {
+    if (args.length < 2) {
+        return await socket.sendMessage(sender, { 
+            text: "📛 *Usage:* `.boom <count> <message>`\n📌 *Example:* `.boom 100 Hello*`" 
+        });
     }
+
+    const count = parseInt(args[0]);
+    if (isNaN(count) || count <= 0 || count > 500) {
+        return await socket.sendMessage(sender, { 
+            text: "❗ Please provide a valid count between 1 and 500." 
+        });
+    }
+
+    const message = args.slice(1).join(" ");
+    for (let i = 0; i < count; i++) {
+        await socket.sendMessage(sender, { text: message });
+        await new Promise(resolve => setTimeout(resolve, 500)); // Optional delay
+    }
+
     break;
 }
                     case 'video': {
