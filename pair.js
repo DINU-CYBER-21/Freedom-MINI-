@@ -778,50 +778,43 @@ function setupCommandHandlers(socket, number) {
     break;
 }
                     
-                case 'cricket':
+                case 'vv':
+case 'retrive':
+case 'viewonce': {
     try {
-        console.log('Fetching cricket news from API...');
-        
-        const response = await fetch('https://suhas-bro-api.vercel.app/news/cricbuzz');
-        console.log(`API Response Status: ${response.status}`);
-
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
+        if (!msg.quoted) {
+            await socket.sendMessage(from, { text: "❌ Please reply to a ViewOnce message." }, { quoted: msg });
+            break;
         }
 
-        const data = await response.json();
-        console.log('API Response Data:', JSON.stringify(data, null, 2));
+        const quoted = msg.quoted.message;
+        let mediaType, sendObj = {};
 
-       
-        if (!data.status || !data.result) {
-            throw new Error('Invalid API response structure: Missing status or result');
+        if (quoted?.imageMessage?.viewOnce) {
+            const buffer = await msg.quoted.download();
+            sendObj = { image: buffer, caption: quoted.imageMessage.caption || '' };
+
+        } else if (quoted?.videoMessage?.viewOnce) {
+            const buffer = await msg.quoted.download();
+            sendObj = { video: buffer, caption: quoted.videoMessage.caption || '' };
+
+        } else if (quoted?.audioMessage?.viewOnce) {
+            const buffer = await msg.quoted.download();
+            sendObj = { audio: buffer, mimetype: "audio/mpeg", ptt: false };
+
+        } else {
+            await socket.sendMessage(from, { text: "❌ Unsupported. Please reply to an image, video, or audio *ViewOnce* message." }, { quoted: msg });
+            break;
         }
 
-        const { title, score, to_win, crr, link } = data.result;
-        if (!title || !score || !to_win || !crr || !link) {
-            throw new Error('Missing required fields in API response: ' + JSON.stringify(data.result));
-        }
+        await socket.sendMessage(from, sendObj, { quoted: msg });
 
-       
-        console.log('Sending message to user...');
-        await socket.sendMessage(sender, {
-            text: formatMessage(
-                '🏏 FREEDOM BOT CEICKET NEWS🏏',
-                `📢 *${title}*\n\n` +
-                `🏆 *mark*: ${score}\n` +
-                `🎯 *to win*: ${to_win}\n` +
-                `📈 *now speed*: ${crr}\n\n` +
-                `🌐 *link*: ${link}`,
-                '> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗'
-            )
-        });
-        console.log('Message sent successfully.');
-    } catch (error) {
-        console.error(`Error in 'news' case: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: '⚠️ දැන්නම් හරි යන්නම ඕන 🙌.'
-        });
+    } catch (err) {
+        console.error("Error:", err);
+        await socket.sendMessage(from, { text: "⚠️ An error occurred while fetching the ViewOnce message." }, { quoted: msg });
     }
+    break;
+}
                     break;
                 case 'vv':
 case 'decvv': {
