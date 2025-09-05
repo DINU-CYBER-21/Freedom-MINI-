@@ -905,79 +905,128 @@ function setupCommandHandlers(socket, number) {
         await socket.sendMessage(sender, { text: "*`Error occurred while downloading`*" });
     }
                       break;
+                       case 'promote':
+          await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+
+          if (!m.isGroup) return m.reply('group cmd')
+            if (!m.isAdmin) return m.reply('admin only')
+            if (!m.isBotAdmin) return m.reply('owner only')
+          let blockwwwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+          await dragon.groupParticipantsUpdate(m.chat, [blockwwwww], 'promote')
+          reply('Done')
+          break
+
+          case 'demote':
+            await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+
+            if (!m.isGroup) return reply('group cmd')
+              if (!m.isAdmin) return reply('admin only')
+              if (!m.isBotAdmin) return reply('owner only')
+                let blockwwwwwa = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+                await dragon.groupParticipantsUpdate(m.chat, [blockwwwwwa], 'demote')
+                reply('Done')
+                break
+
+                case 'kick':
+                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                let blockwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+                await dragon.groupParticipantsUpdate(m.chat, [blockwww], 'remove')
+                reply('Done....')
+                break
+
+                case 'opentime':
+                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[1] == 'second') {
+                    var timer = args[0] * `1000`
+                } else if (args[1] == 'minute') {
+                    var timer = args[0] * `60000`
+                } else if (args[1] == 'hour') {
+                    var timer = args[0] * `3600000`
+                } else if (args[1] == 'day') {
+                    var timer = args[0] * `86400000`
+                } else {
+                    return reply('*select:*\nsecond\nminute\nhour\n\n*example*\n10 second')
                 }
-                       case 'google':
-case 'gsearch':
-case 'search':
-    try {
-        // Check if query is provided
-        if (!args || args.length === 0) {
-            await socket.sendMessage(sender, {
-                text: '⚠️ *Please provide a search query.*\n\n*Example:*\n.google how to code in javascript'
-            });
-            break;
-        }
+                reply(`Open time ${q} starting from now`)
+                setTimeout(() => {
+                    var nomor = m.participant
+                    const open = `*Open time* the group was opened by admin\n now members can send messages`
+                    dragon.groupSettingUpdate(m.chat, 'not_announcement')
+                    reply('Group open Now ')
+                }, timer)
+                break
 
-        const query = args.join(" ");
-        const apiKey = "AIzaSyDMbI3nvmQUrfjoCJYLS69Lej1hSXQjnWI";
-        const cx = "baf9bdb0c631236e5";
-        const apiUrl = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${apiKey}&cx=${cx}`;
+                case 'closetime':
+                  await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+                  if (!m.isGroup) return m.reply('group cmd')
+                    if (!m.isAdmin) return m.reply('admin only')
+                    if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[1] == 'second') {
+                    var timer = args[0] * `1000`
+                } else if (args[1] == 'minute') {
+                    var timer = args[0] * `60000`
+                } else if (args[1] == 'hour') {
+                    var timer = args[0] * `3600000`
+                } else if (args[1] == 'day') {
+                    var timer = args[0] * `86400000`
+                } else {
+                    return reply('*select:*\nsecond\nminute\nhour\n\n*Example*\n10 second')
+                }
+                reply(`Close time ${q} starting from now`)
+                setTimeout(() => {
+                    var nomor = m.participant
+                    const close = `*Close time* group closed by admin\nnow only admin can send messages`
+                    dragon.groupSettingUpdate(m.chat, 'announcement')
+                    reply('Group closed Now')
+                }, timer)
+                break
 
-        // API call
-        const response = await axios.get(apiUrl);
+                case 'group':
+            case 'grup':
+            if (!m.isGroup) return m.reply('group cmd')
+              if (!m.isAdmin) return m.reply('admin only')
+              if (!m.isBotAdmin) return m.reply('owner only')
+                if (args[0] === 'close') {
+                    await dragon.groupSettingUpdate(m.chat, 'announcement').then((res) => reply(`Success Closing Group`))
+                } else if (args[0] === 'open') {
+                    await dragon.groupSettingUpdate(m.chat, 'not_announcement').then((res) => reply(`Success Opening Group`))
+                } else {
+                    reply(`Mode open/close`)
+                }
+            break
 
-        // Check for results
-        if (response.status !== 200 || !response.data.items || response.data.items.length === 0) {
-            await socket.sendMessage(sender, {
-                text: `⚠️ *No results found for:* ${query}`
-            });
-            break;
-        }
+                case 'setnamegc':
+            case 'setsubject':
+              await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
+              if (!m.isGroup) return m.reply('group cmd')
+                if (!m.isAdmin) return m.reply('admin only')
+                if (!m.isBotAdmin) return m.reply('owner only')
+                if (!text) return reply('Text ?')
+                await dragon.groupUpdateSubject(m.chat, text)
+                reply('Succesfully Changed group name')
+                break
 
-        // Format results
-        let results = `🔍 *Google Search Results for:* "${query}"\n\n`;
-        response.data.items.slice(0, 5).forEach((item, index) => {
-            results += `*${index + 1}. ${item.title}*\n\n🔗 ${item.link}\n\n📝 ${item.snippet}\n\n`;
-        });
+                case 'linkgroup':
+                  case 'linkgrup':
+                  case 'linkgc':
+                  case 'gclink':
+                  case 'grouplink':
+                  case 'gruplink':
+                    await dragon.sendMessage(from, { react: { text: `🕓`, key: m.key } });
 
-        // Send results with thumbnail if available
-        const firstResult = response.data.items[0];
-        const thumbnailUrl = firstResult.pagemap?.cse_image?.[0]?.src || firstResult.pagemap?.cse_thumbnail?.[0]?.src || 'https://via.placeholder.com/150';
-
-        await socket.sendMessage(sender, {
-            image: { url: thumbnailUrl },
-            caption: results.trim()
-        });
-
-    } catch (error) {
-        console.error(`Error in Google search: ${error.message}`);
-        await socket.sendMessage(sender, {
-            text: `⚠️ *An error occurred while fetching search results.*\n\n${error.message}`
-        });
-    }
-            break;
-                    case 'boom': {
-    if (args.length < 2) {
-        return await socket.sendMessage(sender, { 
-            text: "📛 *Usage:* `.boom <count> <message>`\n📌 *Example:* `.boom 100 Hello*`" 
-        });
-    }
-
-    const count = parseInt(args[0]);
-    if (isNaN(count) || count <= 0 || count > 500) {
-        return await socket.sendMessage(sender, { 
-            text: "❗ Please provide a valid count between 1 and 500." 
-        });
-    }
-
-    const message = args.slice(1).join(" ");
-    for (let i = 0; i < count; i++) {
-        await socket.sendMessage(sender, { text: message });
-        await new Promise(resolve => setTimeout(resolve, 500)); // Optional delay
-    }
-
-    break;
-}
+                    if (!m.isGroup) return m.reply('group cmd')
+                      let response = await dragon.groupInviteCode(m.chat)
+                      dragon.sendText(m.chat, `👥 *GROUP LINK*\n\n📛 *Name :* ${groupMetadata.subject}\n👤 *Owner Grup :* ${groupMetadata.owner !== undefined ? '+'+ groupMetadata.owner.split`@`[0] : 'Not known'}\n🌱 *ID :* ${groupMetadata.id}\n🔗 *Chat Link :* https://chat.whatsapp.com/${response}\n👥 *Member :* ${groupMetadata.participants.length}\n`, m, {
+                          detectLink: true
+                      })
+                  break
+            }
                     case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
