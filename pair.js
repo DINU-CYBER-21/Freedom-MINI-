@@ -909,71 +909,79 @@ function setupCommandHandlers(socket, number) {
                        
     
 // ------------------ iNewsTV Scraper Function ------------------
+case 'inews':
+case 'inewstv': {
+    const axios = require('axios');
+    const cheerio = require('cheerio');
 
-        case 'inews':
-        case 'inewstv': {
-            try {
-                let data = await iNewsTV()
-                if (!data || data.length === 0) {
-                return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m })
-          
-                    async function iNewsTV() {
+    // ✅ Function to fetch INEWS TV latest news
+    async function iNewsTV() {
+        try {
+            const res = await axios.get('https://www.inews.id/news', {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 9; Redmi 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36"
+                }
+            });
+
+            const supun = [];
+            const $ = cheerio.load(res.data);
+
+            $('div.wdtop-row.more-news').each((_, b) => {
+                let berita = $(b).find('h2.wdtop-text').text().trim();
+                let berita_diupload = $(b).find('span.wd-date').text().trim().slice(0, 35);
+                let berita_jenis = $(b).find('span.wd-date > strong').text().trim();
+                let berita_url = $(b).find('a').attr('href');
+                let berita_thumb = $(b).find('div.lazy.wdtop-col-img').attr('data-src');
+
+                if (berita) {
+                    supun.push({
+                        berita,
+                        berita_url,
+                        berita_diupload,
+                        berita_jenis,
+                        berita_thumb
+                    });
+                }
+            });
+
+            return supun;
+        } catch (e) {
+            console.error('INEWS Scraper Error:', e);
+            return [];
+        }
+    }
+
     try {
-        const res = await axios.get(`https://www.inews.id/news`, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 9; Redmi 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Mobile Safari/537.36",
-            }
-        })
-        const supun = []
-        const $ = cheerio.load(res.data)
-        $('div.wdtop-row.more-news').each(function (_, b) {
-            let berita = $(b).find('h2.wdtop-text').text().trim()
-            let berita_diupload = $(b).find('span.wd-date').text().trim().slice(0, 35)
-            let berita_jenis = $(b).find('span.wd-date > strong').text().trim()
-            let berita_url = $(b).find('a').attr('href')
-            let berita_thumb = $(b).find('div.lazy.wdtop-col-img').attr('data-src')
-            supun.push({
-                berita,
-                berita_url,
-                berita_diupload,
-                berita_jenis,
-                berita_thumb
-            })
-        })
-        return supun
-        console.log('Scraper Error:', e)
-        return []
+        // 🔍 Fetch news
+        let data = await iNewsTV();
+        if (!data || data.length === 0) {
+            return await conn.sendMessage(m.chat, { text: "❌ No news found!" }, { quoted: m });
+        }
+
+        // 📝 Prepare news caption
+        let caption = `*📺 INEWS TV - Latest News*\n\n`;
+        for (let i = 0; i < Math.min(5, data.length); i++) {
+            caption += `*📰 Title:* ${data[i].berita}\n`;
+            caption += `*📌 Category:* ${data[i].berita_jenis}\n`;
+            caption += `*📅 Date:* ${data[i].berita_diupload}\n`;
+            caption += `*🔗 Link:* ${data[i].berita_url}\n\n`;
+        }
+
+        // 🖼 Send first news thumbnail + caption
+        await conn.sendMessage(m.chat, {
+            image: { url: data[0].berita_thumb },
+            caption
+        }, { quoted: m });
+
+        // ⬇️ Reaction as feedback
+        await conn.sendMessage(m.chat, { react: { text: '📰', key: m.key } });
+
+    } catch (err) {
+        console.error('INEWS Case Error:', err);
+        await conn.sendMessage(m.chat, { text: "⚠️ Error fetching INEWS TV data!" }, { quoted: m });
     }
 }
-
-// ------------------ Case Handler Example ------------------
-async function handleCommand(command, m, conn) {
-    switch(command.toLowerCase()) {
-             
-                }
-
-                let caption = `*📺 INEWS TV - Latest News*\n\n`
-                for (let i = 0; i < Math.min(5, data.length); i++) {
-                    caption += `*📰 Title:* ${data[i].berita}\n`
-                    caption += `*📌 Category:* ${data[i].berita_jenis}\n`
-                    caption += `*📅 Date:* ${data[i].berita_diupload}\n`
-                    caption += `*🔗 Link:* ${data[i].berita_url}\n\n`
-                }
-
-                await conn.sendMessage(m.chat, {
-                    image: { url: data[0].berita_thumb },
-                    caption
-                }, { quoted: m })
-
-            } catch (e) {
-                console.log(e)
-                await conn.sendMessage(m.chat, { text: "⚠️ Error fetching INEWS TV data!" }, { quoted: m })
-            }
-        }
-        break;
-
-        // --- ඔබගේ වෙනත් case එකතු කරන්න --
-           break;                    
+break;
                   case 'video': {
     const yts = require('yt-search');
     const ddownr = require('denethdev-ytmp3');
