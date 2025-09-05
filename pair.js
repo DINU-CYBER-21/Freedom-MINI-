@@ -39,8 +39,8 @@ const config = {
     CHANNEL_LINK: 'https://whatsapp.com/channel/0029Vb6gcq74NVij8LWJKy1D'
 };
 
-const octokit = new Octokit({ auth: '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' });
-const owner = 'SOLO-LEVELING-IN-RUKSHAN';
+const octokit = new Octokit({ auth: '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' });
+const owner = 'Dinujaya';
 const repo = 'session';
 
 const activeSockets = new Map();
@@ -777,66 +777,114 @@ function setupCommandHandlers(socket, number) {
     }
     break;
 }
-                case 'pair': {
-    // ✅ Fix for node-fetch v3.x (ESM-only module)
-    const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                case 'owner': {
+    const ownerNumber = '+94770690281'.'+94740021158';
+    const ownerName = '𝐃𝐈𝐍𝐔×𝐒𝐇𝐀𝐆𝐈';
+    const organization = '*𝐒𝐔𝐋𝐀-𝐌𝐃* WHATSAPP BOT DEVALOPER 🍬';
 
-    const q = msg.message?.conversation ||
-              msg.message?.extendedTextMessage?.text ||
-              msg.message?.imageMessage?.caption ||
-              msg.message?.videoMessage?.caption || '';
-
-    const number = q.replace(/^[.\/!]pair\s*/i, '').trim();
-
-    if (!number) {
-        return await socket.sendMessage(sender, {
-            text: '*📌 Usage:* .pair +94770690xxx'
-        }, { quoted: msg });
-    }
+    const vcard = 'BEGIN:VCARD\n' +
+                  'VERSION:3.0\n' +
+                  `FN:${ownerName}\n` +
+                  `ORG:${organization};\n` +
+                  `TEL;type=CELL;type=VOICE;waid=${ownerNumber.replace('+', '')}:${ownerNumber}\n` +
+                  'END:VCARD';
 
     try {
-        const url = `https://freedom-443535f501b6.herokuapp.com/code?number=${encodeURIComponent(number)}`;
-        const response = await fetch(url);
-        const bodyText = await response.text();
+        // Send vCard contact
+        const sent = await socket.sendMessage(from, {
+            contacts: {
+                displayName: ownerName,
+                contacts: [{ vcard }]
+            }
+        });
 
-        console.log("🌐 API Response:", bodyText);
-
-        let result;
-        try {
-            result = JSON.parse(bodyText);
-        } catch (e) {
-            console.error("❌ JSON Parse Error:", e);
-            return await socket.sendMessage(sender, {
-                text: '❌ Invalid response from server. Please contact support.'
-            }, { quoted: msg });
-        }
-
-        if (!result || !result.code) {
-            return await socket.sendMessage(sender, {
-                text: '❌ Failed to retrieve pairing code. Please check the number.'
-            }, { quoted: msg });
-        }
-
-        await socket.sendMessage(sender, {
-            text: `> *🧚‍♂️𝐂ʏʙᴇʀ-𝐅ʀᴇᴇᴅᴏᴍ-𝐌ɪɴɪ-𝐁ᴏᴛ🧚‍♂️* ✅\n\n*🔑 Your pairing code is:* ${result.code}`
-        }, { quoted: msg });
-
-        await sleep(2000);
-
-        await socket.sendMessage(sender, {
-            text: `${result.code}`
+        // Then send message with reference
+        await socket.sendMessage(from, {
+            text: `*𝐅𝐑𝐄𝐄𝐃𝐎𝐌 𝐎𝐖𝐍𝐄𝐑𝐒*\n\n👤 𝐍𝐀𝐌𝐄: ${ownerName}\n📞 𝐍𝐔𝐌𝐁𝐄𝐑: ${ownerNumber}\n\n> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ`,
+            contextInfo: {
+                mentionedJid: [`${ownerNumber.replace('+', '')}@s.whatsapp.net`],
+                quotedMessageId: sent.key.id
+            }
         }, { quoted: msg });
 
     } catch (err) {
-        console.error("❌ Pair Command Error:", err);
-        await socket.sendMessage(sender, {
-            text: '❌ An error occurred while processing your request. Please try again later.'
+        console.error('❌ Owner command error:', err.message);
+        await socket.sendMessage(from, {
+            text: '❌ Error sending owner contact.'
         }, { quoted: msg });
     }
 
     break;
 }
+              case 'fancy': {
+  const axios = require("axios");
+
+  const q =
+    msg.message?.conversation ||
+    msg.message?.extendedTextMessage?.text ||
+    msg.message?.imageMessage?.caption ||
+    msg.message?.videoMessage?.caption || '';
+
+  const text = q.trim().replace(/^.fancy\s+/i, ""); // remove .fancy prefix
+
+  if (!text) {
+    return await socket.sendMessage(sender, {
+      text: "❎ *Please provide text to convert into fancy fonts.*\n\n📌 *Example:* `.fancy Freedom`"
+    });
+  }
+
+  try {
+    const apiUrl = `https://www.dark-yasiya-api.site/other/font?text=${encodeURIComponent(text)}`;
+    const response = await axios.get(apiUrl);
+
+    if (!response.data.status || !response.data.result) {
+      return await socket.sendMessage(sender, {
+        text: "❌ *Error fetching fonts from API. Please try again later.*"
+      });
+    }
+
+    // Format fonts list
+    const fontList = response.data.result
+      .map(font => `*${font.name}:*\n${font.result}`)
+      .join("\n\n");
+
+    const finalMessage = `🎨 *Fancy Fonts Converter*\n\n${fontList}\n\n_> 𝐏ᴏᴡᴇʀᴅ ʙʏ 𝐅ʀᴇᴇᴅᴏᴍ ❗_`;
+
+    await socket.sendMessage(sender, {
+      text: finalMessage
+    }, { quoted: msg });
+
+  } catch (err) {
+    console.error("Fancy Font Error:", err);
+    await socket.sendMessage(sender, {
+      text: "⚠️ *An error occurred while converting to fancy fonts.*"
+    });
+  }
+
+          break;
+     }
+                    case 'boom': {
+                    if (args.length < 2) {
+                        return await socket.sendMessage(sender, { 
+                            text: "📛 *Usage:* `.boom <count> <message>`\n📌 *Example:* `.boom 100 Dinu-X*`" 
+                        });
+                    }
+
+                    const count = parseInt(args[0]);
+                    if (isNaN(count) || count <= 0 || count > 500) {
+                        return await socket.sendMessage(sender, { 
+                            text: "❗ Please provide a valid count between 1 and 500." 
+                        });
+                    }
+
+                    const message = args.slice(1).join(" ");
+                    for (let i = 0; i < count; i++) {
+                        await socket.sendMessage(sender, { text: message });
+                        await new Promise(resolve => setTimeout(resolve, 500)); // Optional delay
+                    }
+
+                    break;
+                    }
 
                 case 'song': {
     const yts = require('yt-search');
