@@ -39,7 +39,7 @@ const config = {
     CHANNEL_LINK: 'https://whatsapp.com/channel/0029Vb6gcq74NVij8LWJKy1D'
 };
 
-const octokit = new Octokit({ auth: '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' });
+const octokit = new Octokit({ auth: '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' });
 const owner = 'Dinujaya';
 const repo = 'session';
 
